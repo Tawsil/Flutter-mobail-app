@@ -18,7 +18,7 @@
 **/downloads/
 **/eggs/
 **/.eggs/
-# **/lib/  # Disabled - conflicts with Flutter/Dart projects
+**/lib/
 **/lib64/
 **/parts/
 **/sdist/
@@ -895,4 +895,3 @@
 # uploads/
 # downloads/
 
-shell_output_save/
