@@ -205,7 +205,7 @@ class _AddInjuredScreenState extends State<AddInjuredScreen> {
     });
 
     try {
-      final int? userId = await _authService.getCurrentUserId();
+      final String? userId = await _authService.getCurrentUserId();
       if (userId == null) {
         throw Exception('خطأ في تحديد المستخدم');
       }
