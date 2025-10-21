@@ -1,0 +1,64 @@
+# 🚀 Palestine Martyrs App - Clean Start
+# Simple Flutter project in root directory
+
+workflows:
+  android-release:
+    name: Palestine Martyrs - Android Release
+    max_build_duration: 60
+    instance_type: linux_x2
+    
+    # Standard Flutter environment with memory optimizations
+    environment:
+      flutter: stable
+      xcode: latest
+      vars:
+        # Gradle optimizations for CI
+        GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
+        
+    triggering:
+      events:
+        - push
+        - tag
+        - pull_request
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+          source: true
+
+    cache:
+      cache_paths:
+        - $HOME/.gradle/caches
+        - ~/.pub-cache
+
+    scripts:
+      - name: Setup and validate
+        script: |
+          set -e
+          echo "✅ Project structure:"
+          ls -la
+          echo "✅ Flutter version:"
+          flutter --version
+          echo "✅ pubspec.yaml found:"
+          head -5 pubspec.yaml
+
+      - name: Get dependencies
+        script: |
+          set -e
+          flutter pub get
+
+      - name: Build release APK
+        script: |
+          set -e
+          echo "🔨 Building release APK (optimized for memory)..."
+          flutter build apk --release --verbose
+
+    artifacts:
+      - build/app/outputs/flutter-apk/app-release.apk
+
+    publishing:
+      email:
+        recipients:
+          - tawsil.developer@gmail.com
+        notify:
+          success: true
+          failure: true

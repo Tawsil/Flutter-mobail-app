@@ -1,0 +1,31 @@
+# استبعاد ملفات Flutter
+lib/
+android/
+ios/
+test/
+integration_test/
+web/
+linux/
+macos/
+windows/
+
+# استبعاد ملفات التطوير
+.flutter-plugins
+.flutter-plugins-dependencies
+.dart_tool/
+.packages
+build/
+.pub-cache/
+.pub/
+
+# استبعاد ملفات إضافية
+.git/
+.gitignore
+README.md
+*.md
+.DS_Store
+.vscode/
+.idea/
+
+# الحفاظ على مجلد backend فقط
+!backend/
