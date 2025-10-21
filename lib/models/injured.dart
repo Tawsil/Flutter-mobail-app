@@ -13,7 +13,7 @@ class Injured extends Equatable {
   final String currentStatus;
   final String? hospitalName;
   final String contactFamily;
-  final int addedByUserId;
+  final String addedByUserId;
   final String? photoPath;
   final String? cvFilePath;
   final String status;
@@ -111,7 +111,7 @@ class Injured extends Equatable {
     String? currentStatus,
     String? hospitalName,
     String? contactFamily,
-    int? addedByUserId,
+    String? addedByUserId,
     String? photoPath,
     String? cvFilePath,
     String? status,

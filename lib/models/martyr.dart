@@ -15,7 +15,7 @@ class Martyr extends Equatable {
   final String? familyStatus;
   final int? numChildren;
   final String contactFamily;
-  final int addedByUserId;
+  final String addedByUserId;
   final String? photoPath;
   final String? cvFilePath;
   final String status;
@@ -125,7 +125,7 @@ class Martyr extends Equatable {
     String? familyStatus,
     int? numChildren,
     String? contactFamily,
-    int? addedByUserId,
+    String? addedByUserId,
     String? photoPath,
     String? cvFilePath,
     String? status,
