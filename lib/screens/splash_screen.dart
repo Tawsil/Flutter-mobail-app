@@ -56,6 +56,8 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     // انتظار لمدة ثانيتين لعرض شاشة البداية
     await Future.delayed(const Duration(seconds: 2));
 
+    if (!mounted) return;
+
     try {
       final bool isLoggedIn = await _authService.isLoggedIn();
       
@@ -63,6 +65,8 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
       if (isLoggedIn) {
         final bool isAdmin = await _authService.isAdmin();
+        
+        if (!mounted) return;
         
         // توجيه المستخدم حسب نوعه
         if (isAdmin) {
@@ -80,6 +84,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
         );
       }
     } catch (e) {
+      print('Error in _checkAuthStatus: $e');
       // في حالة حدوث خطأ، انتقل إلى شاشة تسجيل الدخول
       if (mounted) {
         Navigator.of(context).pushReplacement(

@@ -34,14 +34,15 @@ class FirestoreService {
   Future<User?> getUserByUid(String uid) async {
     try {
       final doc = await _usersCollection.doc(uid).get();
-      if (doc.exists) {
-        final data = doc.data() as Map<String, dynamic>;
+      if (doc.exists && doc.data() != null) {
+        final data = Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
         data['uid'] = uid;
         return User.fromMap(data);
       }
       return null;
     } catch (e) {
-      throw Exception('خطأ في جلب المستخدم: $e');
+      print('Error in getUserByUid: $e');
+      return null;
     }
   }
 
