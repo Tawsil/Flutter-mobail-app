@@ -7,6 +7,7 @@ import '../services/auth_service.dart';
 import 'login_screen.dart';
 import 'admin_dashboard_screen.dart';
 import 'user_dashboard_screen.dart';
+import 'debug_error_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -20,77 +21,80 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
+  
+  // تخزين الـ debug logs
+  final List<String> _debugLogs = [];
+  
+  void _addLog(String message) {
+    _debugLogs.add('${DateTime.now().toString().substring(11, 19)} - $message');
+    print(message);
+  }
 
   @override
   void initState() {
     super.initState();
-    print('=== SplashScreen: initState started ===');
+    _addLog('=== SplashScreen: initState started ===');
     try {
       _initAnimations();
-      print('=== SplashScreen: Animations initialized ===');
+      _addLog('✓ Animations initialized');
       _cleanAndCheckAuth().catchError((error, stackTrace) {
-        print('=== FATAL ERROR in _cleanAndCheckAuth ===');
-        print('Error: $error');
-        print('StackTrace: $stackTrace');
-        // عرض شاشة خطأ
+        _addLog('❌ FATAL ERROR in _cleanAndCheckAuth');
+        _addLog('Error: $error');
         if (mounted) {
-          _showErrorScreen(error.toString());
+          _showErrorScreen(error.toString(), stackTrace.toString());
         }
       });
     } catch (e, stackTrace) {
-      print('=== FATAL ERROR in initState ===');
-      print('Error: $e');
-      print('StackTrace: $stackTrace');
+      _addLog('❌ FATAL ERROR in initState');
+      _addLog('Error: $e');
       if (mounted) {
-        _showErrorScreen(e.toString());
+        _showErrorScreen(e.toString(), stackTrace.toString());
       }
     }
   }
 
   // عرض شاشة خطأ واضحة
-  void _showErrorScreen(String error) {
-    setState(() {
-      // سنعرض رسالة خطأ في البناء
-    });
-    // بعد 3 ثواني، ننتقل لشاشة تسجيل الدخول
-    Future.delayed(const Duration(seconds: 5), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
-      }
-    });
+  void _showErrorScreen(String error, [String stackTrace = '']) {
+    if (!mounted) return;
+    
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => DebugErrorScreen(
+          errorMessage: error,
+          stackTrace: stackTrace,
+          debugLogs: _debugLogs,
+        ),
+      ),
+    );
   }
 
   // تنظيف البيانات القديمة وفحص حالة المصادقة
   Future<void> _cleanAndCheckAuth() async {
     try {
-      print('=== Step 1: Cleaning old data ===');
+      _addLog('=== Step 1: Cleaning old data ===');
       try {
         final prefs = await SharedPreferences.getInstance();
         final keysToCheck = ['user_role', 'role'];
         for (var key in keysToCheck) {
           if (prefs.containsKey(key)) {
-            print('Removing old key: $key');
+            _addLog('Removing old key: $key');
             await prefs.remove(key);
           }
         }
-        print('✓ Old data cleaned successfully');
+        _addLog('✓ Old data cleaned successfully');
       } catch (e, st) {
-        print('⚠ Error cleaning old data: $e');
-        print('StackTrace: $st');
+        _addLog('⚠ Error cleaning old data: $e');
         // نستمر حتى لو فشل التنظيف
       }
       
-      print('=== Step 2: Checking auth status ===');
+      _addLog('=== Step 2: Checking auth status ===');
       await _checkAuthStatus();
-      print('=== Step 3: Auth check completed ===');
+      _addLog('✓ Auth check completed');
     } catch (e, stackTrace) {
-      print('=== FATAL ERROR in _cleanAndCheckAuth ===');
-      print('Error: $e');
-      print('StackTrace: $stackTrace');
+      _addLog('❌ FATAL ERROR in _cleanAndCheckAuth');
+      _addLog('Error: $e');
       if (mounted) {
-        _showErrorScreen(e.toString());
+        _showErrorScreen(e.toString(), stackTrace.toString());
       }
     }
   }
@@ -122,85 +126,83 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   Future<void> _checkAuthStatus() async {
     try {
-      print('=== Auth Check: Starting ===');
+      _addLog('=== Auth Check: Starting ===');
       
       // انتظار لمدة ثانيتين لعرض شاشة البداية
-      print('=== Auth Check: Waiting 2 seconds ===');
+      _addLog('Waiting 2 seconds...');
       await Future.delayed(const Duration(seconds: 2));
-      print('=== Auth Check: Wait completed ===');
+      _addLog('✓ Wait completed');
 
       if (!mounted) {
-        print('=== Auth Check: Widget not mounted, returning ===');
+        _addLog('⚠ Widget not mounted, returning');
         return;
       }
 
-      print('=== Auth Check: Calling isLoggedIn ===');
-      print('=== Auth Check: Calling isLoggedIn ===');
+      _addLog('Calling isLoggedIn...');
       final bool isLoggedIn = await _authService.isLoggedIn().catchError((error) {
-        print('ERROR in isLoggedIn: $error');
+        _addLog('❌ ERROR in isLoggedIn: $error');
         return false;
       });
-      print('✓ Auth Check: isLoggedIn = $isLoggedIn');
+      _addLog('✓ isLoggedIn = $isLoggedIn');
       
       if (!mounted) {
-        print('=== Auth Check: Widget not mounted after isLoggedIn, returning ===');
+        _addLog('⚠ Widget not mounted after isLoggedIn');
         return;
       }
 
       if (isLoggedIn) {
-        print('=== Auth Check: User is logged in, checking admin status ===');
+        _addLog('User is logged in, checking admin status...');
         
         final bool isAdmin = await _authService.isAdmin().catchError((error) {
-          print('ERROR in isAdmin: $error');
+          _addLog('❌ ERROR in isAdmin: $error');
           return false;
         });
-        print('✓ Auth Check: isAdmin = $isAdmin');
+        _addLog('✓ isAdmin = $isAdmin');
         
         // للتحقق: طباعة بيانات المستخدم الحالي
         try {
           final currentUser = await _authService.getCurrentUser();
           if (currentUser != null) {
-            print('✓ Auth Check: User email = ${currentUser.email}');
-            print('✓ Auth Check: User userType = ${currentUser.userType}');
+            _addLog('✓ User email = ${currentUser.email}');
+            _addLog('✓ User userType = ${currentUser.userType}');
           } else {
-            print('⚠ Auth Check: getCurrentUser returned null!');
+            _addLog('⚠ getCurrentUser returned null!');
           }
         } catch (e) {
-          print('ERROR getting current user: $e');
+          _addLog('❌ ERROR getting current user: $e');
         }
         
         if (!mounted) {
-          print('=== Auth Check: Widget not mounted after getting user info, returning ===');
+          _addLog('⚠ Widget not mounted after getting user info');
           return;
         }
         
         // توجيه المستخدم حسب نوعه
         if (isAdmin) {
-          print('=== Auth Check: Navigating to Admin Dashboard ===');
+          _addLog('✓ Navigating to Admin Dashboard');
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
           );
         } else {
-          print('=== Auth Check: Navigating to User Dashboard ===');
+          _addLog('✓ Navigating to User Dashboard');
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const UserDashboardScreen()),
           );
         }
       } else {
-        print('=== Auth Check: User not logged in, navigating to Login Screen ===');
+        _addLog('✓ User not logged in, navigating to Login');
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const LoginScreen()),
         );
       }
       
-      print('=== Auth Check: Navigation completed successfully ===');
+      _addLog('✓ Navigation completed successfully');
     } catch (e, stackTrace) {
-      print('=== FATAL ERROR in _checkAuthStatus ===');
-      print('Error: $e');
-      print('StackTrace: $stackTrace');
+      _addLog('❌ FATAL ERROR in _checkAuthStatus');
+      _addLog('Error: $e');
       // في حالة حدوث خطأ، عرض شاشة خطأ
       if (mounted) {
-        _showErrorScreen(e.toString());
+        _showErrorScreen(e.toString(), stackTrace.toString());
       }
     }
   }
