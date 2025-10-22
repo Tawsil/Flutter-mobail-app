@@ -6,36 +6,100 @@ import 'firebase_options.dart';
 import 'constants/app_colors.dart';
 import 'constants/app_constants.dart';
 import 'screens/splash_screen.dart';
+import 'screens/debug_error_screen.dart';
 
 void main() async {
-  // تهيئة Flutter
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  print('=== APP STARTING ===');
-  
-  // تهيئة Firebase مع معالجة الأخطاء
-  bool firebaseInitialized = false;
+  // تهيئة Flutter مع معالجة أخطاء شاملة
   try {
-    print('Initializing Firebase...');
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    firebaseInitialized = true;
-    print('Firebase initialized successfully!');
+    WidgetsFlutterBinding.ensureInitialized();
+    
+    print('=== APP STARTING ===');
+    print('Flutter initialized successfully');
+    
+    // تهيئة Firebase مع معالجة الأخطاء
+    bool firebaseInitialized = false;
+    String? firebaseError;
+    
+    try {
+      print('Initializing Firebase...');
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      firebaseInitialized = true;
+      print('Firebase initialized successfully!');
+    } catch (e, stackTrace) {
+      print('=== FATAL ERROR: Firebase initialization failed ===');
+      print('Error: $e');
+      print('StackTrace: $stackTrace');
+      firebaseError = 'Firebase Init Error: $e';
+    }
+    
+    // معالج الأخطاء العالمي لـ Flutter
+    FlutterError.onError = (FlutterErrorDetails details) {
+      print('=== FLUTTER ERROR CAUGHT ===');
+      print('Error: ${details.exception}');
+      print('StackTrace: ${details.stack}');
+      FlutterError.presentError(details);
+    };
+    
+    // تشغيل التطبيق
+    runApp(PalestineMartyrApp(
+      firebaseInitialized: firebaseInitialized,
+      initError: firebaseError,
+    ));
   } catch (e, stackTrace) {
-    print('=== FATAL ERROR: Firebase initialization failed ===');
+    print('=== CRITICAL ERROR IN MAIN ===');
     print('Error: $e');
     print('StackTrace: $stackTrace');
+    
+    // محاولة تشغيل التطبيق بشاشة خطأ بسيطة
+    runApp(MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.red,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 100, color: Colors.white),
+                const SizedBox(height: 20),
+                const Text(
+                  'خطأ حرج في التطبيق',
+                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Error: $e',
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: 'Error: $e\n\nStackTrace: $stackTrace'));
+                  },
+                  child: const Text('نسخ معلومات الخطأ'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ));
   }
-  
-  // تشغيل التطبيق حتى لو فشل Firebase (لعرض رسالة خطأ)
-  runApp(PalestineMartyrApp(firebaseInitialized: firebaseInitialized));
 }
 
 class PalestineMartyrApp extends StatelessWidget {
   final bool firebaseInitialized;
+  final String? initError;
   
-  const PalestineMartyrApp({Key? key, required this.firebaseInitialized}) : super(key: key);
+  const PalestineMartyrApp({
+    Key? key, 
+    required this.firebaseInitialized,
+    this.initError,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +244,13 @@ class PalestineMartyrApp extends StatelessWidget {
       ),
       
       // الشاشة الرئيسية
-      home: const SplashScreen(),
+      home: initError != null
+          ? DebugErrorScreen(
+              errorMessage: initError!,
+              stackTrace: '',
+              debugLogs: ['App initialization failed'],
+            )
+          : const SplashScreen(),
     );
   }
   
