@@ -1,4 +1,4 @@
-package com.tawsil.martyrs.palestine_martyrs
+package com.example.palestinemartyrs
 
 import io.flutter.embedding.android.FlutterActivity
 
