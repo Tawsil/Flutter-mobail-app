@@ -8,22 +8,34 @@ import 'constants/app_constants.dart';
 import 'screens/splash_screen.dart';
 
 void main() async {
+  // تهيئة Flutter
   WidgetsFlutterBinding.ensureInitialized();
   
-  // تهيئة Firebase
+  print('=== APP STARTING ===');
+  
+  // تهيئة Firebase مع معالجة الأخطاء
+  bool firebaseInitialized = false;
   try {
+    print('Initializing Firebase...');
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-  } catch (e) {
-    print('Error initializing Firebase: $e');
+    firebaseInitialized = true;
+    print('Firebase initialized successfully!');
+  } catch (e, stackTrace) {
+    print('=== FATAL ERROR: Firebase initialization failed ===');
+    print('Error: $e');
+    print('StackTrace: $stackTrace');
   }
   
-  runApp(const PalestineMartyrApp());
+  // تشغيل التطبيق حتى لو فشل Firebase (لعرض رسالة خطأ)
+  runApp(PalestineMartyrApp(firebaseInitialized: firebaseInitialized));
 }
 
 class PalestineMartyrApp extends StatelessWidget {
-  const PalestineMartyrApp({Key? key}) : super(key: key);
+  final bool firebaseInitialized;
+  
+  const PalestineMartyrApp({Key? key, required this.firebaseInitialized}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

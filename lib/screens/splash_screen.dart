@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../services/auth_service.dart';
@@ -24,7 +25,32 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   void initState() {
     super.initState();
     _initAnimations();
-    _checkAuthStatus();
+    _cleanAndCheckAuth();
+  }
+
+  // تنظيف البيانات القديمة وفحص حالة المصادقة
+  Future<void> _cleanAndCheckAuth() async {
+    try {
+      // تنظيف البيانات القديمة من SharedPreferences
+      print('=== Cleaning old data ===');
+      final prefs = await SharedPreferences.getInstance();
+      
+      // حذف أي مفاتيح قديمة قد تسبب مشاكل
+      final keysToCheck = ['user_role', 'role'];
+      for (var key in keysToCheck) {
+        if (prefs.containsKey(key)) {
+          print('Removing old key: $key');
+          await prefs.remove(key);
+        }
+      }
+      
+      print('Old data cleaned successfully');
+    } catch (e) {
+      print('Error cleaning old data: $e');
+    }
+    
+    // الآن فحص حالة المصادقة
+    await _checkAuthStatus();
   }
 
   void _initAnimations() {

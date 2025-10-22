@@ -15,6 +15,8 @@ class AuthService {
   // تسجيل الدخول
   Future<User?> login(String email, String password) async {
     try {
+      print('=== Login attempt for: $email ===');
+      
       // تسجيل الدخول عبر Firebase Auth
       final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
@@ -22,19 +24,57 @@ class AuthService {
       );
 
       if (userCredential.user != null) {
-        // جلب بيانات المستخدم من Firestore
-        final user = await _firestoreService.getUserByUid(userCredential.user!.uid);
+        print('Firebase Auth login successful');
+        print('User UID: ${userCredential.user!.uid}');
         
-        if (user != null) {
-          // حفظ بيانات المستخدم محلياً
-          await _saveUserSession(user);
-          // تحديث آخر تسجيل دخول
-          await _firestoreService.updateUserLastLogin(user.uid!);
-          return user;
+        // جلب بيانات المستخدم من Firestore
+        var user = await _firestoreService.getUserByUid(userCredential.user!.uid);
+        
+        // إذا لم يكن المستخدم موجود في Firestore، ننشئه
+        if (user == null) {
+          print('User not found in Firestore, creating document...');
+          
+          // إنشاء مستخدم بنوع admin إذا كان البريد يحتوي على "admin"
+          final userType = email.toLowerCase().contains('admin') 
+              ? AppConstants.userTypeAdmin 
+              : AppConstants.userTypeRegular;
+          
+          user = User(
+            uid: userCredential.user!.uid,
+            email: email,
+            username: email.split('@')[0],
+            fullName: userCredential.user!.displayName ?? email.split('@')[0],
+            userType: userType,
+            createdAt: DateTime.now(),
+          );
+          
+          try {
+            await _firestoreService.createUser(user);
+            print('User document created in Firestore');
+          } catch (e) {
+            print('Error creating user in Firestore: $e');
+            throw Exception('فشل إنشاء بيانات المستخدم');
+          }
         }
+        
+        // حفظ بيانات المستخدم محلياً
+        await _saveUserSession(user);
+        print('User session saved');
+        
+        // تحديث آخر تسجيل دخول
+        try {
+          await _firestoreService.updateUserLastLogin(user.uid!);
+          print('Last login updated');
+        } catch (e) {
+          print('Warning: Could not update last login: $e');
+        }
+        
+        print('Login successful for user: ${user.email}');
+        return user;
       }
       return null;
     } on firebase_auth.FirebaseAuthException catch (e) {
+      print('Firebase Auth Exception: ${e.code}');
       String message = 'خطأ في تسجيل الدخول';
       switch (e.code) {
         case 'user-not-found':
@@ -49,11 +89,17 @@ class AuthService {
         case 'user-disabled':
           message = 'هذا الحساب معطل';
           break;
+        case 'invalid-credential':
+          message = 'بيانات الدخول غير صحيحة';
+          break;
         default:
           message = 'خطأ في تسجيل الدخول: ${e.message}';
       }
       throw Exception(message);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('=== ERROR in login ===');
+      print('Error: $e');
+      print('StackTrace: $stackTrace');
       throw Exception('خطأ في تسجيل الدخول: $e');
     }
   }
@@ -134,11 +180,33 @@ class AuthService {
   // الحصول على المستخدم الحالي
   Future<User?> getCurrentUser() async {
     try {
+      print('=== Getting current user ===');
       final firebaseUser = _firebaseAuth.currentUser;
-      if (firebaseUser == null) return null;
-
-      return await _firestoreService.getUserByUid(firebaseUser.uid);
-    } catch (e) {
+      
+      if (firebaseUser == null) {
+        print('No Firebase user found');
+        return null;
+      }
+      
+      print('Firebase user found: ${firebaseUser.email}');
+      print('Firebase user UID: ${firebaseUser.uid}');
+      
+      final user = await _firestoreService.getUserByUid(firebaseUser.uid);
+      
+      if (user == null) {
+        print('WARNING: Firebase user exists but Firestore document not found!');
+        print('This means the user needs to be created in Firestore');
+        // إذا كان المستخدم موجود في Auth وليس في Firestore، نقوم بتسجيل الخروج
+        await logout();
+        return null;
+      }
+      
+      print('User fetched successfully from Firestore');
+      return user;
+    } catch (e, stackTrace) {
+      print('=== ERROR in getCurrentUser ===');
+      print('Error: $e');
+      print('StackTrace: $stackTrace');
       return null;
     }
   }
