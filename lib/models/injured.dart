@@ -13,7 +13,7 @@ class Injured extends Equatable {
   final String currentStatus;
   final String? hospitalName;
   final String contactFamily;
-  final String addedByUserId;
+  final String addedByUserId; // User ID from Firebase Auth (String UID)
   final String? photoPath;
   final String? cvFilePath;
   final String status;
@@ -111,7 +111,7 @@ class Injured extends Equatable {
     String? currentStatus,
     String? hospitalName,
     String? contactFamily,
-    String? addedByUserId,
+    String? addedByUserId, // User ID from Firebase Auth (String UID)
     String? photoPath,
     String? cvFilePath,
     String? status,

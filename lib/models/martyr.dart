@@ -15,7 +15,7 @@ class Martyr extends Equatable {
   final String? familyStatus;
   final int? numChildren;
   final String contactFamily;
-  final String addedByUserId;
+  final String addedByUserId; // User ID from Firebase Auth (String UID)
   final String? photoPath;
   final String? cvFilePath;
   final String status;
@@ -125,7 +125,7 @@ class Martyr extends Equatable {
     String? familyStatus,
     int? numChildren,
     String? contactFamily,
-    String? addedByUserId,
+    String? addedByUserId, // User ID from Firebase Auth (String UID)
     String? photoPath,
     String? cvFilePath,
     String? status,

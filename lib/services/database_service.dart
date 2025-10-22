@@ -27,8 +27,9 @@ class DatabaseService {
     
     return await openDatabase(
       path,
-      version: 1,
+      version: 2, // ✅ Incremented version for schema change
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -63,14 +64,13 @@ class DatabaseService {
         family_status TEXT,
         num_children INTEGER,
         contact_family TEXT NOT NULL,
-        added_by_user_id INTEGER NOT NULL,
+        added_by_user_id TEXT NOT NULL,
         photo_path TEXT,
         cv_file_path TEXT,
         status TEXT NOT NULL DEFAULT '${AppConstants.statusPending}',
         admin_notes TEXT,
         created_at TEXT NOT NULL,
-        updated_at TEXT,
-        FOREIGN KEY (added_by_user_id) REFERENCES ${AppConstants.tableUsers} (id)
+        updated_at TEXT
       )
     ''');
 
@@ -88,14 +88,13 @@ class DatabaseService {
         current_status TEXT NOT NULL,
         hospital_name TEXT,
         contact_family TEXT NOT NULL,
-        added_by_user_id INTEGER NOT NULL,
+        added_by_user_id TEXT NOT NULL,
         photo_path TEXT,
         cv_file_path TEXT,
         status TEXT NOT NULL DEFAULT '${AppConstants.statusPending}',
         admin_notes TEXT,
         created_at TEXT NOT NULL,
-        updated_at TEXT,
-        FOREIGN KEY (added_by_user_id) REFERENCES ${AppConstants.tableUsers} (id)
+        updated_at TEXT
       )
     ''');
 
@@ -113,14 +112,13 @@ class DatabaseService {
         family_contact TEXT NOT NULL,
         detention_place TEXT,
         notes TEXT,
-        added_by_user_id INTEGER NOT NULL,
+        added_by_user_id TEXT NOT NULL,
         photo_path TEXT,
         cv_file_path TEXT,
         status TEXT NOT NULL DEFAULT '${AppConstants.statusPending}',
         admin_notes TEXT,
         created_at TEXT NOT NULL,
-        updated_at TEXT,
-        FOREIGN KEY (added_by_user_id) REFERENCES ${AppConstants.tableUsers} (id)
+        updated_at TEXT
       )
     ''');
 
@@ -132,6 +130,92 @@ class DatabaseService {
       'user_type': AppConstants.userTypeAdmin,
       'created_at': DateTime.now().toIso8601String(),
     });
+  }
+
+  // دالة upgrade لتحديث قاعدة البيانات
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // تحديث من version 1 إلى version 2
+      // تغيير added_by_user_id من INTEGER إلى TEXT
+      
+      // للأسف SQLite لا يدعم ALTER COLUMN، يجب إعادة إنشاء الجداول
+      // لكن لحسن الحظ في المرحلة التجريبية، يمكننا حذف وإعادة إنشاء
+      await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableMartyrs}');
+      await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableInjured}');
+      await db.execute('DROP TABLE IF EXISTS ${AppConstants.tablePrisoners}');
+      
+      // إعادة إنشاء الجداول بالنظام الجديد
+      await db.execute('''
+        CREATE TABLE ${AppConstants.tableMartyrs} (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          full_name TEXT NOT NULL,
+          nickname TEXT,
+          tribe TEXT NOT NULL,
+          birth_date TEXT,
+          death_date TEXT NOT NULL,
+          death_place TEXT NOT NULL,
+          cause_of_death TEXT NOT NULL,
+          rank_or_position TEXT,
+          participation_fronts TEXT,
+          family_status TEXT,
+          num_children INTEGER,
+          contact_family TEXT NOT NULL,
+          added_by_user_id TEXT NOT NULL,
+          photo_path TEXT,
+          cv_file_path TEXT,
+          status TEXT NOT NULL DEFAULT '${AppConstants.statusPending}',
+          admin_notes TEXT,
+          created_at TEXT NOT NULL,
+          updated_at TEXT
+        )
+      ''');
+
+      await db.execute('''
+        CREATE TABLE ${AppConstants.tableInjured} (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          full_name TEXT NOT NULL,
+          tribe TEXT NOT NULL,
+          injury_date TEXT NOT NULL,
+          injury_place TEXT NOT NULL,
+          injury_type TEXT NOT NULL,
+          injury_description TEXT NOT NULL,
+          injury_degree TEXT NOT NULL,
+          current_status TEXT NOT NULL,
+          hospital_name TEXT,
+          contact_family TEXT NOT NULL,
+          added_by_user_id TEXT NOT NULL,
+          photo_path TEXT,
+          cv_file_path TEXT,
+          status TEXT NOT NULL DEFAULT '${AppConstants.statusPending}',
+          admin_notes TEXT,
+          created_at TEXT NOT NULL,
+          updated_at TEXT
+        )
+      ''');
+
+      await db.execute('''
+        CREATE TABLE ${AppConstants.tablePrisoners} (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          full_name TEXT NOT NULL,
+          tribe TEXT NOT NULL,
+          capture_date TEXT NOT NULL,
+          capture_place TEXT NOT NULL,
+          captured_by TEXT NOT NULL,
+          current_status TEXT NOT NULL,
+          release_date TEXT,
+          family_contact TEXT NOT NULL,
+          detention_place TEXT,
+          notes TEXT,
+          added_by_user_id TEXT NOT NULL,
+          photo_path TEXT,
+          cv_file_path TEXT,
+          status TEXT NOT NULL DEFAULT '${AppConstants.statusPending}',
+          admin_notes TEXT,
+          created_at TEXT NOT NULL,
+          updated_at TEXT
+        )
+      ''');
+    }
   }
 
   // ===== دوال المستخدمين =====

@@ -13,7 +13,7 @@ class Prisoner extends Equatable {
   final String familyContact;
   final String? detentionPlace;
   final String? notes;
-  final String addedByUserId;
+  final String addedByUserId; // User ID from Firebase Auth (String UID)
   final String? photoPath;
   final String? cvFilePath;
   final String status;
@@ -110,7 +110,7 @@ class Prisoner extends Equatable {
     String? familyContact,
     String? detentionPlace,
     String? notes,
-    String? addedByUserId,
+    String? addedByUserId, // User ID from Firebase Auth (String UID)
     String? photoPath,
     String? cvFilePath,
     String? status,
