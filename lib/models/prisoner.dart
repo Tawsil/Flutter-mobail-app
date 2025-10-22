@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import '../constants/app_constants.dart';
 
 class Prisoner extends Equatable {
-  final int? id;
+  final String? id;
   final String fullName;
   final String tribe;
   final DateTime captureDate;
@@ -99,7 +99,7 @@ class Prisoner extends Equatable {
   }
 
   Prisoner copyWith({
-    int? id,
+    String? id,
     String? fullName,
     String? tribe,
     DateTime? captureDate,

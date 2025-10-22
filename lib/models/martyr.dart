@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import '../constants/app_constants.dart';
 
 class Martyr extends Equatable {
-  final int? id;
+  final String? id;
   final String fullName;
   final String? nickname;
   final String tribe;
@@ -112,7 +112,7 @@ class Martyr extends Equatable {
   }
 
   Martyr copyWith({
-    int? id,
+    String? id,
     String? fullName,
     String? nickname,
     String? tribe,

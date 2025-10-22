@@ -199,7 +199,7 @@ class FirestoreService {
       if (martyr.id == null) {
         throw Exception('Martyr ID is required');
       }
-      await _martyrsCollection.doc(martyr.id.toString()).update(_convertMartyrToFirestore(martyr));
+      await _martyrsCollection.doc(martyr.id).update(_convertMartyrToFirestore(martyr));
     } catch (e) {
       throw Exception('خطأ في تحديث الشهيد: $e');
     }
@@ -273,7 +273,7 @@ class FirestoreService {
       if (injured.id == null) {
         throw Exception('Injured ID is required');
       }
-      await _injuredCollection.doc(injured.id.toString()).update(_convertInjuredToFirestore(injured));
+      await _injuredCollection.doc(injured.id).update(_convertInjuredToFirestore(injured));
     } catch (e) {
       throw Exception('خطأ في تحديث الجريح: $e');
     }
@@ -347,7 +347,7 @@ class FirestoreService {
       if (prisoner.id == null) {
         throw Exception('Prisoner ID is required');
       }
-      await _prisonersCollection.doc(prisoner.id.toString()).update(_convertPrisonerToFirestore(prisoner));
+      await _prisonersCollection.doc(prisoner.id).update(_convertPrisonerToFirestore(prisoner));
     } catch (e) {
       throw Exception('خطأ في تحديث الأسير: $e');
     }
@@ -402,7 +402,7 @@ class FirestoreService {
       'death_place': martyr.deathPlace,
       'cause_of_death': martyr.causeOfDeath,
       'contact_family': martyr.contactFamily,
-      'added_by_user_id': martyr.addedByUserId.toString(),
+      'added_by_user_id': martyr.addedByUserId,
       'status': martyr.status,
       'created_at': martyr.createdAt.millisecondsSinceEpoch,
     };
@@ -423,7 +423,7 @@ class FirestoreService {
 
   Martyr _convertFirestoreToMartyr(Map<String, dynamic> data) {
     return Martyr(
-      id: int.tryParse(data['id']?.toString() ?? '0'),
+      id: data['id']?.toString(),
       fullName: data['full_name'] ?? '',
       nickname: data['nickname'],
       tribe: data['tribe'] ?? '',
@@ -461,7 +461,7 @@ class FirestoreService {
       'injury_degree': injured.injuryDegree,
       'current_status': injured.currentStatus,
       'contact_family': injured.contactFamily,
-      'added_by_user_id': injured.addedByUserId.toString(),
+      'added_by_user_id': injured.addedByUserId,
       'status': injured.status,
       'created_at': injured.createdAt.millisecondsSinceEpoch,
     };
@@ -477,7 +477,7 @@ class FirestoreService {
 
   Injured _convertFirestoreToInjured(Map<String, dynamic> data) {
     return Injured(
-      id: int.tryParse(data['id']?.toString() ?? '0'),
+      id: data['id']?.toString(),
       fullName: data['full_name'] ?? '',
       tribe: data['tribe'] ?? '',
       injuryDate: DateTime.fromMillisecondsSinceEpoch(data['injury_date'] ?? 0),
@@ -509,7 +509,7 @@ class FirestoreService {
       'captured_by': prisoner.capturedBy,
       'current_status': prisoner.currentStatus,
       'family_contact': prisoner.familyContact,
-      'added_by_user_id': prisoner.addedByUserId.toString(),
+      'added_by_user_id': prisoner.addedByUserId,
       'status': prisoner.status,
       'created_at': prisoner.createdAt.millisecondsSinceEpoch,
     };
@@ -527,7 +527,7 @@ class FirestoreService {
 
   Prisoner _convertFirestoreToPrisoner(Map<String, dynamic> data) {
     return Prisoner(
-      id: int.tryParse(data['id']?.toString() ?? '0'),
+      id: data['id']?.toString(),
       fullName: data['full_name'] ?? '',
       tribe: data['tribe'] ?? '',
       captureDate: DateTime.fromMillisecondsSinceEpoch(data['capture_date'] ?? 0),

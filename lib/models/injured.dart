@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import '../constants/app_constants.dart';
 
 class Injured extends Equatable {
-  final int? id;
+  final String? id;
   final String fullName;
   final String tribe;
   final DateTime injuryDate;
@@ -100,7 +100,7 @@ class Injured extends Equatable {
   }
 
   Injured copyWith({
-    int? id,
+    String? id,
     String? fullName,
     String? tribe,
     DateTime? injuryDate,

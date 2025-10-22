@@ -102,7 +102,7 @@ class _AdminPrisonersManagementScreenState
     if (confirmed == true) {
       try {
         await _firestoreService.updatePrisonerStatus(
-          prisoner.id.toString(),
+          prisoner.id!,
           AppConstants.statusApproved,
           null,
         );
@@ -141,7 +141,7 @@ class _AdminPrisonersManagementScreenState
 
     if (confirmed == true) {
       try {
-        await _firestoreService.deletePrisoner(prisoner.id.toString());
+        await _firestoreService.deletePrisoner(prisoner.id!);
         _loadPrisoners();
         
         if (mounted) {

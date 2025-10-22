@@ -102,7 +102,7 @@ class _AdminMartyrsManagementScreenState
     if (confirmed == true) {
       try {
         await _firestoreService.updateMartyrStatus(
-          martyr.id.toString(),
+          martyr.id!,
           AppConstants.statusApproved,
           null,
         );
@@ -141,7 +141,7 @@ class _AdminMartyrsManagementScreenState
 
     if (confirmed == true) {
       try {
-        await _firestoreService.deleteMartyr(martyr.id.toString());
+        await _firestoreService.deleteMartyr(martyr.id!);
         _loadMartyrs();
         
         if (mounted) {

@@ -102,7 +102,7 @@ class _AdminInjuredManagementScreenState
     if (confirmed == true) {
       try {
         await _firestoreService.updateInjuredStatus(
-          injured.id.toString(),
+          injured.id!,
           AppConstants.statusApproved,
           null,
         );
@@ -141,7 +141,7 @@ class _AdminInjuredManagementScreenState
 
     if (confirmed == true) {
       try {
-        await _firestoreService.deleteInjured(injured.id.toString());
+        await _firestoreService.deleteInjured(injured.id!);
         _loadInjured();
         
         if (mounted) {
