@@ -180,31 +180,41 @@ class AuthService {
   // الحصول على المستخدم الحالي
   Future<User?> getCurrentUser() async {
     try {
-      print('=== Getting current user ===');
+      print('=== AuthService: Getting current user ===');
       final firebaseUser = _firebaseAuth.currentUser;
       
       if (firebaseUser == null) {
-        print('No Firebase user found');
+        print('✓ AuthService: No Firebase user found');
         return null;
       }
       
-      print('Firebase user found: ${firebaseUser.email}');
-      print('Firebase user UID: ${firebaseUser.uid}');
+      print('✓ AuthService: Firebase user found: ${firebaseUser.email}');
+      print('✓ AuthService: Firebase user UID: ${firebaseUser.uid}');
       
-      final user = await _firestoreService.getUserByUid(firebaseUser.uid);
+      print('=== AuthService: Fetching user from Firestore ===');
+      final user = await _firestoreService.getUserByUid(firebaseUser.uid).catchError((error) {
+        print('ERROR fetching user from Firestore: $error');
+        return null;
+      });
       
       if (user == null) {
-        print('WARNING: Firebase user exists but Firestore document not found!');
-        print('This means the user needs to be created in Firestore');
+        print('⚠ AuthService: Firebase user exists but Firestore document not found!');
+        print('⚠ AuthService: Logging out user...');
         // إذا كان المستخدم موجود في Auth وليس في Firestore، نقوم بتسجيل الخروج
-        await logout();
+        try {
+          await logout();
+          print('✓ AuthService: User logged out successfully');
+        } catch (e) {
+          print('ERROR logging out: $e');
+        }
         return null;
       }
       
-      print('User fetched successfully from Firestore');
+      print('✓ AuthService: User fetched successfully from Firestore');
+      print('✓ AuthService: User email: ${user.email}, userType: ${user.userType}');
       return user;
     } catch (e, stackTrace) {
-      print('=== ERROR in getCurrentUser ===');
+      print('=== FATAL ERROR in getCurrentUser ===');
       print('Error: $e');
       print('StackTrace: $stackTrace');
       return null;
@@ -213,15 +223,34 @@ class AuthService {
 
   // التحقق من حالة تسجيل الدخول
   Future<bool> isLoggedIn() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(AppConstants.keyIsLoggedIn) ?? false;
+    try {
+      print('=== AuthService: Checking isLoggedIn ===');
+      final prefs = await SharedPreferences.getInstance();
+      final isLoggedIn = prefs.getBool(AppConstants.keyIsLoggedIn) ?? false;
+      print('✓ AuthService: isLoggedIn = $isLoggedIn');
+      return isLoggedIn;
+    } catch (e, stackTrace) {
+      print('ERROR in isLoggedIn: $e');
+      print('StackTrace: $stackTrace');
+      return false; // افتراض عدم تسجيل الدخول في حالة الخطأ
+    }
   }
 
   // التحقق من نوع المستخدم
   Future<bool> isAdmin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userType = prefs.getString(AppConstants.keyUserType);
-    return userType == AppConstants.userTypeAdmin;
+    try {
+      print('=== AuthService: Checking isAdmin ===');
+      final prefs = await SharedPreferences.getInstance();
+      final userType = prefs.getString(AppConstants.keyUserType);
+      print('✓ AuthService: userType = $userType');
+      final isAdmin = userType == AppConstants.userTypeAdmin;
+      print('✓ AuthService: isAdmin = $isAdmin');
+      return isAdmin;
+    } catch (e, stackTrace) {
+      print('ERROR in isAdmin: $e');
+      print('StackTrace: $stackTrace');
+      return false; // افتراض عدم كون المستخدم admin في حالة الخطأ
+    }
   }
 
   // تسجيل الخروج

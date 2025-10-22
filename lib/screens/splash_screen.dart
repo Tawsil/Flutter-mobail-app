@@ -24,33 +24,75 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    _initAnimations();
-    _cleanAndCheckAuth();
+    print('=== SplashScreen: initState started ===');
+    try {
+      _initAnimations();
+      print('=== SplashScreen: Animations initialized ===');
+      _cleanAndCheckAuth().catchError((error, stackTrace) {
+        print('=== FATAL ERROR in _cleanAndCheckAuth ===');
+        print('Error: $error');
+        print('StackTrace: $stackTrace');
+        // عرض شاشة خطأ
+        if (mounted) {
+          _showErrorScreen(error.toString());
+        }
+      });
+    } catch (e, stackTrace) {
+      print('=== FATAL ERROR in initState ===');
+      print('Error: $e');
+      print('StackTrace: $stackTrace');
+      if (mounted) {
+        _showErrorScreen(e.toString());
+      }
+    }
+  }
+
+  // عرض شاشة خطأ واضحة
+  void _showErrorScreen(String error) {
+    setState(() {
+      // سنعرض رسالة خطأ في البناء
+    });
+    // بعد 3 ثواني، ننتقل لشاشة تسجيل الدخول
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      }
+    });
   }
 
   // تنظيف البيانات القديمة وفحص حالة المصادقة
   Future<void> _cleanAndCheckAuth() async {
     try {
-      // تنظيف البيانات القديمة من SharedPreferences
-      print('=== Cleaning old data ===');
-      final prefs = await SharedPreferences.getInstance();
-      
-      // حذف أي مفاتيح قديمة قد تسبب مشاكل
-      final keysToCheck = ['user_role', 'role'];
-      for (var key in keysToCheck) {
-        if (prefs.containsKey(key)) {
-          print('Removing old key: $key');
-          await prefs.remove(key);
+      print('=== Step 1: Cleaning old data ===');
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final keysToCheck = ['user_role', 'role'];
+        for (var key in keysToCheck) {
+          if (prefs.containsKey(key)) {
+            print('Removing old key: $key');
+            await prefs.remove(key);
+          }
         }
+        print('✓ Old data cleaned successfully');
+      } catch (e, st) {
+        print('⚠ Error cleaning old data: $e');
+        print('StackTrace: $st');
+        // نستمر حتى لو فشل التنظيف
       }
       
-      print('Old data cleaned successfully');
-    } catch (e) {
-      print('Error cleaning old data: $e');
+      print('=== Step 2: Checking auth status ===');
+      await _checkAuthStatus();
+      print('=== Step 3: Auth check completed ===');
+    } catch (e, stackTrace) {
+      print('=== FATAL ERROR in _cleanAndCheckAuth ===');
+      print('Error: $e');
+      print('StackTrace: $stackTrace');
+      if (mounted) {
+        _showErrorScreen(e.toString());
+      }
     }
-    
-    // الآن فحص حالة المصادقة
-    await _checkAuthStatus();
   }
 
   void _initAnimations() {
@@ -79,60 +121,86 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   }
 
   Future<void> _checkAuthStatus() async {
-    // انتظار لمدة ثانيتين لعرض شاشة البداية
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (!mounted) return;
-
     try {
-      print('=== DEBUG: Checking auth status ===');
-      final bool isLoggedIn = await _authService.isLoggedIn();
-      print('DEBUG: isLoggedIn = $isLoggedIn');
+      print('=== Auth Check: Starting ===');
       
-      if (!mounted) return;
+      // انتظار لمدة ثانيتين لعرض شاشة البداية
+      print('=== Auth Check: Waiting 2 seconds ===');
+      await Future.delayed(const Duration(seconds: 2));
+      print('=== Auth Check: Wait completed ===');
+
+      if (!mounted) {
+        print('=== Auth Check: Widget not mounted, returning ===');
+        return;
+      }
+
+      print('=== Auth Check: Calling isLoggedIn ===');
+      print('=== Auth Check: Calling isLoggedIn ===');
+      final bool isLoggedIn = await _authService.isLoggedIn().catchError((error) {
+        print('ERROR in isLoggedIn: $error');
+        return false;
+      });
+      print('✓ Auth Check: isLoggedIn = $isLoggedIn');
+      
+      if (!mounted) {
+        print('=== Auth Check: Widget not mounted after isLoggedIn, returning ===');
+        return;
+      }
 
       if (isLoggedIn) {
-        final bool isAdmin = await _authService.isAdmin();
-        print('DEBUG: isAdmin = $isAdmin');
+        print('=== Auth Check: User is logged in, checking admin status ===');
+        
+        final bool isAdmin = await _authService.isAdmin().catchError((error) {
+          print('ERROR in isAdmin: $error');
+          return false;
+        });
+        print('✓ Auth Check: isAdmin = $isAdmin');
         
         // للتحقق: طباعة بيانات المستخدم الحالي
-        final currentUser = await _authService.getCurrentUser();
-        if (currentUser != null) {
-          print('DEBUG: Current user email = ${currentUser.email}');
-          print('DEBUG: Current user userType = ${currentUser.userType}');
-        } else {
-          print('DEBUG: Current user is null!');
+        try {
+          final currentUser = await _authService.getCurrentUser();
+          if (currentUser != null) {
+            print('✓ Auth Check: User email = ${currentUser.email}');
+            print('✓ Auth Check: User userType = ${currentUser.userType}');
+          } else {
+            print('⚠ Auth Check: getCurrentUser returned null!');
+          }
+        } catch (e) {
+          print('ERROR getting current user: $e');
         }
         
-        if (!mounted) return;
+        if (!mounted) {
+          print('=== Auth Check: Widget not mounted after getting user info, returning ===');
+          return;
+        }
         
         // توجيه المستخدم حسب نوعه
         if (isAdmin) {
-          print('DEBUG: Navigating to Admin Dashboard');
+          print('=== Auth Check: Navigating to Admin Dashboard ===');
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
           );
         } else {
-          print('DEBUG: Navigating to User Dashboard');
+          print('=== Auth Check: Navigating to User Dashboard ===');
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const UserDashboardScreen()),
           );
         }
       } else {
-        print('DEBUG: Navigating to Login Screen');
+        print('=== Auth Check: User not logged in, navigating to Login Screen ===');
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const LoginScreen()),
         );
       }
+      
+      print('=== Auth Check: Navigation completed successfully ===');
     } catch (e, stackTrace) {
-      print('=== ERROR in _checkAuthStatus ===');
+      print('=== FATAL ERROR in _checkAuthStatus ===');
       print('Error: $e');
       print('StackTrace: $stackTrace');
-      // في حالة حدوث خطأ، انتقل إلى شاشة تسجيل الدخول
+      // في حالة حدوث خطأ، عرض شاشة خطأ
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
+        _showErrorScreen(e.toString());
       }
     }
   }
