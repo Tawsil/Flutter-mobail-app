@@ -33,15 +33,35 @@ class FirestoreService {
 
   Future<User?> getUserByUid(String uid) async {
     try {
+      print('DEBUG: Getting user by UID: $uid');
       final doc = await _usersCollection.doc(uid).get();
-      if (doc.exists && doc.data() != null) {
-        final data = Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
-        data['uid'] = uid;
-        return User.fromMap(data);
+      
+      if (!doc.exists) {
+        print('DEBUG: User document does not exist for UID: $uid');
+        return null;
       }
-      return null;
-    } catch (e) {
-      print('Error in getUserByUid: $e');
+      
+      if (doc.data() == null) {
+        print('DEBUG: User document data is null for UID: $uid');
+        return null;
+      }
+      
+      final rawData = doc.data() as Map<String, dynamic>;
+      print('DEBUG: Raw Firestore data: $rawData');
+      
+      final data = Map<String, dynamic>.from(rawData);
+      data['uid'] = uid;
+      
+      print('DEBUG: Processed data with uid: $data');
+      
+      final user = User.fromMap(data);
+      print('DEBUG: User created successfully. Email: ${user.email}, UserType: ${user.userType}');
+      
+      return user;
+    } catch (e, stackTrace) {
+      print('=== ERROR in getUserByUid ===');
+      print('Error: $e');
+      print('StackTrace: $stackTrace');
       return null;
     }
   }

@@ -26,6 +26,27 @@ class User extends Equatable {
   });
 
   factory User.fromMap(Map<String, dynamic> map) {
+    // قراءة userType من عدة مصادر محتملة مع معالجة القيم القديمة
+    String userTypeValue = '';
+    if (map['user_type'] != null && map['user_type'].toString().isNotEmpty) {
+      userTypeValue = map['user_type'].toString();
+    } else if (map['userType'] != null && map['userType'].toString().isNotEmpty) {
+      userTypeValue = map['userType'].toString();
+    } else if (map['role'] != null && map['role'].toString().isNotEmpty) {
+      // للتوافق مع البيانات القديمة التي كانت تستخدم 'role'
+      userTypeValue = map['role'].toString();
+    }
+    
+    // تحويل القيم القديمة إلى القيم الجديدة
+    if (userTypeValue.toLowerCase() == 'admin') {
+      userTypeValue = 'admin';
+    } else if (userTypeValue.toLowerCase() == 'regular' || userTypeValue.toLowerCase() == 'user') {
+      userTypeValue = 'regular';
+    } else if (userTypeValue.isEmpty) {
+      // إذا كان فارغاً، استخدم القيمة الافتراضية
+      userTypeValue = 'regular';
+    }
+
     return User(
       uid: map['uid'],
       id: map['id'],
@@ -33,7 +54,7 @@ class User extends Equatable {
       username: map['username'] ?? map['email']?.split('@')[0] ?? '',
       password: map['password'],
       fullName: map['full_name'] ?? map['fullName'] ?? '',
-      userType: map['user_type'] ?? map['userType'] ?? '',
+      userType: userTypeValue,
       phoneNumber: map['phone_number'] ?? map['phoneNumber'],
       createdAt: map['created_at'] != null 
           ? (map['created_at'] is String 

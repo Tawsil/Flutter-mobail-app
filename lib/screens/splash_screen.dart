@@ -59,32 +59,49 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     if (!mounted) return;
 
     try {
+      print('=== DEBUG: Checking auth status ===');
       final bool isLoggedIn = await _authService.isLoggedIn();
+      print('DEBUG: isLoggedIn = $isLoggedIn');
       
       if (!mounted) return;
 
       if (isLoggedIn) {
         final bool isAdmin = await _authService.isAdmin();
+        print('DEBUG: isAdmin = $isAdmin');
+        
+        // للتحقق: طباعة بيانات المستخدم الحالي
+        final currentUser = await _authService.getCurrentUser();
+        if (currentUser != null) {
+          print('DEBUG: Current user email = ${currentUser.email}');
+          print('DEBUG: Current user userType = ${currentUser.userType}');
+        } else {
+          print('DEBUG: Current user is null!');
+        }
         
         if (!mounted) return;
         
         // توجيه المستخدم حسب نوعه
         if (isAdmin) {
+          print('DEBUG: Navigating to Admin Dashboard');
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
           );
         } else {
+          print('DEBUG: Navigating to User Dashboard');
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const UserDashboardScreen()),
           );
         }
       } else {
+        print('DEBUG: Navigating to Login Screen');
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const LoginScreen()),
         );
       }
-    } catch (e) {
-      print('Error in _checkAuthStatus: $e');
+    } catch (e, stackTrace) {
+      print('=== ERROR in _checkAuthStatus ===');
+      print('Error: $e');
+      print('StackTrace: $stackTrace');
       // في حالة حدوث خطأ، انتقل إلى شاشة تسجيل الدخول
       if (mounted) {
         Navigator.of(context).pushReplacement(
