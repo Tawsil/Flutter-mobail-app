@@ -102,15 +102,77 @@ class PalestineMartyrApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // عرض شاشة خطأ إذا فشل Firebase
+    if (!firebaseInitialized && initError != null) {
+      return MaterialApp(
+        title: 'Firebase Error',
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          backgroundColor: AppColors.error,
+          body: SafeArea(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 100,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'خطأ في تهيئة Firebase',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        initError!,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: initError!));
+                      },
+                      child: const Text('نسخ رسالة الخطأ'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    
+    // التطبيق العادي
     return MaterialApp(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: AppColors.primary,
-        scaffoldBackgroundColor: AppColors.background,
+        primaryColor: AppColors.primaryGreen,
+        scaffoldBackgroundColor: AppColors.backgroundLight,
         fontFamily: 'Tajawal',
         appBarTheme: const AppBarTheme(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.primaryGreen,
           foregroundColor: Colors.white,
           elevation: 0,
         ),
@@ -124,10 +186,7 @@ class PalestineMartyrApp extends StatelessWidget {
         Locale('ar', 'SA'),
       ],
       locale: const Locale('ar', 'SA'),
-      home: SplashScreen(
-        firebaseInitialized: firebaseInitialized,
-        initError: initError,
-      ),
+      home: const SplashScreen(),
     );
   }
 }
