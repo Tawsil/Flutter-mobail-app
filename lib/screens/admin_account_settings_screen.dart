@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../models/user.dart';
 import '../services/auth_service.dart';
-import '../services/database_service.dart';
+import '../services/firestore_service.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_dialogs.dart';
 
@@ -17,11 +17,12 @@ class AdminAccountSettingsScreen extends StatefulWidget {
 class _AdminAccountSettingsScreenState
     extends State<AdminAccountSettingsScreen> {
   final AuthService _authService = AuthService();
-  final DatabaseService _dbService = DatabaseService();
+  final FirestoreService _firestoreService = FirestoreService();
   
   // Controllers for user info
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   
   // Controllers for password change
@@ -51,6 +52,7 @@ class _AdminAccountSettingsScreenState
   void dispose() {
     _fullNameController.dispose();
     _usernameController.dispose();
+    _emailController.dispose();
     _phoneController.dispose();
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
@@ -67,6 +69,7 @@ class _AdminAccountSettingsScreenState
           _currentUser = user;
           _fullNameController.text = user.fullName;
           _usernameController.text = user.username;
+          _emailController.text = user.email;
           _phoneController.text = user.phoneNumber ?? '';
           _isLoading = false;
         });
@@ -103,12 +106,13 @@ class _AdminAccountSettingsScreenState
       final updatedUser = _currentUser!.copyWith(
         fullName: _fullNameController.text.trim(),
         username: _usernameController.text.trim(),
+        email: _emailController.text.trim(),
         phoneNumber: _phoneController.text.trim().isEmpty 
             ? null 
             : _phoneController.text.trim(),
       );
 
-      await _dbService.updateUser(updatedUser);
+      await _firestoreService.updateUser(updatedUser);
       setState(() {
         _currentUser = updatedUser;
         _isUpdatingInfo = false;
@@ -151,22 +155,16 @@ class _AdminAccountSettingsScreenState
     setState(() => _isChangingPassword = true);
 
     try {
-      // التحقق من كلمة المرور الحالية
-      final isCurrentPasswordValid = await _authService.verifyPassword(
-        _currentUser!.username,
+      // استخدام AuthService.changePassword
+      final success = await _authService.changePassword(
         _currentPasswordController.text,
+        _newPasswordController.text,
       );
 
-      if (!isCurrentPasswordValid) {
-        throw Exception('كلمة المرور الحالية غير صحيحة');
+      if (!success) {
+        throw Exception('فشل تغيير كلمة المرور');
       }
 
-      // تحديث كلمة المرور
-      final updatedUser = _currentUser!.copyWith(
-        password: _newPasswordController.text,
-      );
-
-      await _dbService.updateUser(updatedUser);
       setState(() => _isChangingPassword = false);
 
       // مسح حقول كلمات المرور
@@ -211,6 +209,16 @@ class _AdminAccountSettingsScreenState
     }
     if (value.trim().length < 3) {
       return 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'يرجى إدخال البريد الإلكتروني';
+    }
+    if (!_authService.isValidEmail(value.trim())) {
+      return 'البريد الإلكتروني غير صالح';
     }
     return null;
   }
@@ -313,6 +321,15 @@ class _AdminAccountSettingsScreenState
                               label: 'اسم المستخدم',
                               icon: Icons.account_circle_outlined,
                               validator: _validateUsername,
+                            ),
+                            const SizedBox(height: 16),
+                            
+                            CustomTextField(
+                              controller: _emailController,
+                              label: 'البريد الإلكتروني',
+                              icon: Icons.email_outlined,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: _validateEmail,
                             ),
                             const SizedBox(height: 16),
                             

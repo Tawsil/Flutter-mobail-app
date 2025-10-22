@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_colors.dart';
 import '../widgets/custom_dialogs.dart';
 import '../widgets/info_card.dart';
+import '../services/backup_service.dart';
+import '../services/theme_service.dart';
 
 class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({Key? key}) : super(key: key);
@@ -12,6 +14,9 @@ class AppSettingsScreen extends StatefulWidget {
 }
 
 class _AppSettingsScreenState extends State<AppSettingsScreen> {
+  final BackupService _backupService = BackupService();
+  final ThemeService _themeService = ThemeService();
+  
   bool _notificationsEnabled = true;
   bool _dailyNotifications = true;
   bool _weeklyNotifications = true;
@@ -64,7 +69,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     );
 
     if (confirmed == true) {
-      // محاكاة عملية النسخ الاحتياطي
+      // عرض مربع حوار التقدم
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -80,33 +85,38 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
         ),
       );
 
-      // محاكاة الانتظار
-      await Future.delayed(const Duration(seconds: 3));
+      try {
+        // إنشاء النسخة الاحتياطية فعلياً
+        await _backupService.createBackup();
 
-      if (mounted) {
-        Navigator.pop(context); // إغلاق مربع حوار التقدم
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم إنشاء النسخة الاحتياطية بنجاح'),
-            backgroundColor: AppColors.success,
-          ),
-        );
+        if (mounted) {
+          Navigator.pop(context); // إغلاق مربع حوار التقدم
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✅ تم إنشاء النسخة الاحتياطية بنجاح وحفظها في السحابة'),
+              backgroundColor: AppColors.success,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          Navigator.pop(context); // إغلاق مربع حوار التقدم
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('خطأ في إنشاء النسخة الاحتياطية: $e'),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
       }
     }
   }
 
   Future<void> _restoreBackup() async {
-    final confirmed = await CustomDialogs.showConfirmationDialog(
-      context: context,
-      title: 'استعادة النسخة الاحتياطية',
-      content: 'هل تريد استعادة البيانات من النسخة الاحتياطية؟\n\nتحذير: سيتم استبدال البيانات الحالية!',
-      confirmText: 'استعادة',
-      cancelText: 'إلغاء',
-      isDestructive: true,
-    );
-
-    if (confirmed == true) {
-      // محاكاة عملية الاستعادة
+    try {
+      // جلب قائمة النسخ الاحتياطية
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -116,21 +126,125 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
             children: [
               const CircularProgressIndicator(color: AppColors.primaryGreen),
               const SizedBox(height: 16),
-              const Text('جاري استعادة البيانات...'),
+              const Text('جاري تحميل النسخ الاحتياطية...'),
             ],
           ),
         ),
       );
 
-      // محاكاة الانتظار
-      await Future.delayed(const Duration(seconds: 3));
-
+      final backups = await _backupService.getBackupsList();
+      
       if (mounted) {
         Navigator.pop(context); // إغلاق مربع حوار التقدم
+        
+        if (backups.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('لا توجد نسخ احتياطية متاحة'),
+              backgroundColor: AppColors.warning,
+            ),
+          );
+          return;
+        }
+
+        // عرض قائمة بالنسخ الاحتياطية
+        final selectedBackup = await showDialog<String>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('اختر نسخة احتياطية'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: backups.length,
+                itemBuilder: (context, index) {
+                  final backup = backups[index];
+                  final date = DateTime.parse(backup['created_at']);
+                  final stats = backup['statistics'] ?? {};
+                  
+                  return ListTile(
+                    title: Text('نسخة ${date.day}/${date.month}/${date.year}'),
+                    subtitle: Text(
+                      'شهداء: ${stats['martyrs_count'] ?? 0} | '
+                      'جرحى: ${stats['injured_count'] ?? 0} | '
+                      'أسرى: ${stats['prisoners_count'] ?? 0}'
+                    ),
+                    leading: const Icon(Icons.backup, color: AppColors.info),
+                    onTap: () => Navigator.pop(context, backup['id']),
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('إلغاء'),
+              ),
+            ],
+          ),
+        );
+
+        if (selectedBackup != null) {
+          final confirmed = await CustomDialogs.showConfirmationDialog(
+            context: context,
+            title: 'استعادة النسخة الاحتياطية',
+            content: 'هل تريد استعادة البيانات من النسخة الاحتياطية؟\n\nتحذير: سيتم استبدال البيانات الحالية!',
+            confirmText: 'استعادة',
+            cancelText: 'إلغاء',
+            isDestructive: true,
+          );
+
+          if (confirmed == true) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => AlertDialog(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircularProgressIndicator(color: AppColors.primaryGreen),
+                    const SizedBox(height: 16),
+                    const Text('جاري استعادة البيانات...'),
+                  ],
+                ),
+              ),
+            );
+
+            try {
+              await _backupService.restoreBackup(selectedBackup);
+              
+              if (mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('✅ تم استعادة البيانات بنجاح'),
+                    backgroundColor: AppColors.success,
+                    duration: Duration(seconds: 3),
+                  ),
+                );
+              }
+            } catch (e) {
+              if (mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('خطأ في استعادة البيانات: $e'),
+                    backgroundColor: AppColors.error,
+                    duration: const Duration(seconds: 4),
+                  ),
+                );
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم استعادة البيانات بنجاح'),
-            backgroundColor: AppColors.success,
+          SnackBar(
+            content: Text('خطأ: $e'),
+            backgroundColor: AppColors.error,
           ),
         );
       }
