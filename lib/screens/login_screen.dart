@@ -270,36 +270,39 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // معلومات الحساب التجريبي
+                        // رسالة المرحلة التجريبية
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: AppColors.backgroundLight,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppColors.textLight),
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.primaryGreen.withOpacity(0.1),
+                                AppColors.info.withOpacity(0.1),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.primaryGreen.withOpacity(0.3),
+                              width: 2,
+                            ),
                           ),
-                          child: Column(
+                          child: Row(
                             children: [
-                              Text(
-                                'حساب المسؤول التجريبي:',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                ),
+                              Icon(
+                                Icons.info_outline,
+                                color: AppColors.primaryGreen,
+                                size: 28,
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'البريد: admin@palestine.com',
-                                style: TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontFamily: 'monospace',
-                                ),
-                              ),
-                              Text(
-                                'كلمة المرور: Admin@123456',
-                                style: TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontFamily: 'monospace',
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'التطبيق في أول مراحله التجريبية',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                    fontSize: 16,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ],

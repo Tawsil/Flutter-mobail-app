@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'constants/app_colors.dart';
 import 'constants/app_constants.dart';
 import 'screens/splash_screen.dart';
+import 'services/theme_service.dart';
 
 void main() async {
   bool firebaseInitialized = false;
@@ -16,6 +17,11 @@ void main() async {
     
     print('=== PALESTINE MARTYR APP STARTING ===');
     print('Flutter initialized successfully');
+    
+    // تهيئة ThemeService
+    print('Initializing ThemeService...');
+    await ThemeService().initialize();
+    print('✅ ThemeService initialized successfully!');
     
     // معالج الأخطاء العالمي لـ Flutter
     FlutterError.onError = (FlutterErrorDetails details) {
@@ -90,7 +96,7 @@ void main() async {
   }
 }
 
-class PalestineMartyrApp extends StatelessWidget {
+class PalestineMartyrApp extends StatefulWidget {
   final bool firebaseInitialized;
   final String? initError;
   
@@ -101,9 +107,16 @@ class PalestineMartyrApp extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<PalestineMartyrApp> createState() => _PalestineMartyrAppState();
+}
+
+class _PalestineMartyrAppState extends State<PalestineMartyrApp> {
+  final ThemeService _themeService = ThemeService();
+
+  @override
   Widget build(BuildContext context) {
     // عرض شاشة خطأ إذا فشل Firebase
-    if (!firebaseInitialized && initError != null) {
+    if (!widget.firebaseInitialized && widget.initError != null) {
       return MaterialApp(
         title: 'Firebase Error',
         debugShowCheckedModeBanner: false,
@@ -139,7 +152,7 @@ class PalestineMartyrApp extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        initError!,
+                        widget.initError!,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -150,7 +163,7 @@ class PalestineMartyrApp extends StatelessWidget {
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
-                        Clipboard.setData(ClipboardData(text: initError!));
+                        Clipboard.setData(ClipboardData(text: widget.initError!));
                       },
                       child: const Text('نسخ رسالة الخطأ'),
                     ),
@@ -163,30 +176,61 @@ class PalestineMartyrApp extends StatelessWidget {
       );
     }
     
-    // التطبيق العادي
-    return MaterialApp(
-      title: AppConstants.appName,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: AppColors.primaryGreen,
-        scaffoldBackgroundColor: AppColors.backgroundLight,
-        fontFamily: 'Tajawal',
-        appBarTheme: const AppBarTheme(
-          backgroundColor: AppColors.primaryGreen,
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-      ),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('ar', 'SA'),
-      ],
-      locale: const Locale('ar', 'SA'),
-      home: const SplashScreen(),
+    // التطبيق العادي مع دعم التحديث الديناميكي
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: _themeService.themeModeNotifier,
+      builder: (context, themeMode, child) {
+        return ValueListenableBuilder<Locale>(
+          valueListenable: _themeService.localeNotifier,
+          builder: (context, locale, child) {
+            return MaterialApp(
+              title: AppConstants.appName,
+              debugShowCheckedModeBanner: false,
+              
+              // دعم المظهر الديناميكي
+              themeMode: themeMode,
+              theme: ThemeData(
+                primaryColor: AppColors.primaryGreen,
+                scaffoldBackgroundColor: AppColors.backgroundLight,
+                fontFamily: 'Tajawal',
+                brightness: Brightness.light,
+                appBarTheme: const AppBarTheme(
+                  backgroundColor: AppColors.primaryGreen,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                ),
+              ),
+              darkTheme: ThemeData(
+                primaryColor: AppColors.primaryGreen,
+                scaffoldBackgroundColor: const Color(0xFF121212),
+                fontFamily: 'Tajawal',
+                brightness: Brightness.dark,
+                appBarTheme: AppBarTheme(
+                  backgroundColor: AppColors.primaryGreen.withOpacity(0.9),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                ),
+                cardTheme: CardTheme(
+                  color: const Color(0xFF1E1E1E),
+                ),
+              ),
+              
+              // دعم اللغة الديناميكي
+              locale: locale,
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('ar', 'SA'),
+                Locale('en', 'US'),
+              ],
+              home: const SplashScreen(),
+            );
+          },
+        );
+      },
     );
   }
 }

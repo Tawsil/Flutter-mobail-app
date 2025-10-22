@@ -475,9 +475,11 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                 subtitle: Text(_appTheme),
                 trailing: DropdownButton<String>(
                   value: _appTheme,
-                  onChanged: (value) {
+                  onChanged: (value) async {
                     setState(() => _appTheme = value!);
-                    _saveSetting('app_theme', value);
+                    await _saveSetting('app_theme', value);
+                    // تحديث المظهر فوراً
+                    await _themeService.saveThemeMode(value!);
                   },
                   items: ['فاتح', 'داكن', 'النظام']
                       .map((theme) => DropdownMenuItem(
@@ -493,9 +495,11 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                 subtitle: Text(_language),
                 trailing: DropdownButton<String>(
                   value: _language,
-                  onChanged: (value) {
+                  onChanged: (value) async {
                     setState(() => _language = value!);
-                    _saveSetting('language', value);
+                    await _saveSetting('language', value);
+                    // تحديث اللغة فوراً
+                    await _themeService.saveLanguage(value!);
                   },
                   items: ['العربية', 'English']
                       .map((lang) => DropdownMenuItem(

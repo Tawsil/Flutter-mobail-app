@@ -9,6 +9,16 @@ class ThemeService {
   static const String _themeKey = 'app_theme';
   static const String _languageKey = 'app_language';
 
+  // ValueNotifiers للتحديث الديناميكي
+  final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(ThemeMode.system);
+  final ValueNotifier<Locale> localeNotifier = ValueNotifier(const Locale('ar', 'SA'));
+
+  /// تهيئة الخدمة وتحميل الإعدادات المحفوظة
+  Future<void> initialize() async {
+    themeModeNotifier.value = await getSavedThemeMode();
+    localeNotifier.value = await getSavedLanguage();
+  }
+
   /// الحصول على وضع المظهر المحفوظ
   Future<ThemeMode> getSavedThemeMode() async {
     try {
@@ -29,11 +39,25 @@ class ThemeService {
     }
   }
 
-  /// حفظ وضع المظهر
+  /// حفظ وضع المظهر مع التحديث الديناميكي
   Future<void> saveThemeMode(String theme) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_themeKey, theme);
+      
+      // تحديث ThemeMode فوراً
+      switch (theme) {
+        case 'فاتح':
+          themeModeNotifier.value = ThemeMode.light;
+          break;
+        case 'داكن':
+          themeModeNotifier.value = ThemeMode.dark;
+          break;
+        case 'النظام':
+        default:
+          themeModeNotifier.value = ThemeMode.system;
+          break;
+      }
     } catch (e) {
       print('Error saving theme: $e');
     }
@@ -58,11 +82,24 @@ class ThemeService {
     }
   }
 
-  /// حفظ اللغة
+  /// حفظ اللغة مع التحديث الديناميكي
   Future<void> saveLanguage(String language) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_languageKey, language);
+      
+      // تحديث Locale فوراً
+      switch (language) {
+        case 'العربية':
+          localeNotifier.value = const Locale('ar', 'SA');
+          break;
+        case 'English':
+          localeNotifier.value = const Locale('en', 'US');
+          break;
+        default:
+          localeNotifier.value = const Locale('ar', 'SA');
+          break;
+      }
     } catch (e) {
       print('Error saving language: $e');
     }
