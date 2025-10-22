@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../models/prisoner.dart';
-import '../services/database_service.dart';
+import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import '../services/file_service.dart';
 
@@ -39,7 +39,7 @@ class _AddPrisonerScreenState extends State<AddPrisonerScreen> {
   File? _cvFile;
 
   // الخدمات
-  final DatabaseService _dbService = DatabaseService();
+  final FirestoreService _firestoreService = FirestoreService();
   final AuthService _authService = AuthService();
   final FileService _fileService = FileService();
 
@@ -236,9 +236,9 @@ class _AddPrisonerScreenState extends State<AddPrisonerScreen> {
         createdAt: DateTime.now(),
       );
 
-      await _dbService.insertPrisoner(prisoner);
+      await _firestoreService.insertPrisoner(prisoner);
 
-      _showSuccessMessage('تم إرسال بيانات الأسير بنجاح! سيتم مراجعتها من قبل المسؤول.');
+      _showSuccessMessage('تم إرسال بيانات الأسير بنجاح إلى السحابة! سيتم مراجعتها من قبل المسؤول.');
 
       // العودة للصفحة السابقة
       Navigator.of(context).pop();

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../models/martyr.dart';
-import '../services/database_service.dart';
+import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import '../services/file_service.dart';
 
@@ -41,7 +41,7 @@ class _AddMartyrScreenState extends State<AddMartyrScreen> {
   File? _cvFile;
 
   // الخدمات
-  final DatabaseService _dbService = DatabaseService();
+  final FirestoreService _firestoreService = FirestoreService();
   final AuthService _authService = AuthService();
   final FileService _fileService = FileService();
 
@@ -242,9 +242,9 @@ class _AddMartyrScreenState extends State<AddMartyrScreen> {
         createdAt: DateTime.now(),
       );
 
-      await _dbService.insertMartyr(martyr);
+      await _firestoreService.insertMartyr(martyr);
 
-      _showSuccessMessage('تم إرسال بيانات الشهيد بنجاح! سيتم مراجعتها من قبل المسؤول.');
+      _showSuccessMessage('تم إرسال بيانات الشهيد بنجاح إلى السحابة! سيتم مراجعتها من قبل المسؤول.');
 
       // العودة للصفحة السابقة
       Navigator.of(context).pop();

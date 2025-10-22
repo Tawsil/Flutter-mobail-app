@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../models/prisoner.dart';
-import '../services/database_service.dart';
+import '../services/firestore_service.dart';
 import '../widgets/custom_dialogs.dart';
 import '../widgets/info_card.dart';
 
@@ -16,7 +16,7 @@ class AdminPrisonersManagementScreen extends StatefulWidget {
 
 class _AdminPrisonersManagementScreenState
     extends State<AdminPrisonersManagementScreen> {
-  final DatabaseService _dbService = DatabaseService();
+  final FirestoreService _firestoreService = FirestoreService();
   List<Prisoner> _prisoners = [];
   List<Prisoner> _filteredPrisoners = [];
   bool _isLoading = true;
@@ -40,7 +40,7 @@ class _AdminPrisonersManagementScreenState
   Future<void> _loadPrisoners() async {
     try {
       setState(() => _isLoading = true);
-      final prisoners = await _dbService.getAllPrisoners();
+      final prisoners = await _firestoreService.getAllPrisoners();
       setState(() {
         _prisoners = prisoners;
         _applyFilters();
@@ -101,8 +101,11 @@ class _AdminPrisonersManagementScreenState
 
     if (confirmed == true) {
       try {
-        final updatedPrisoner = prisoner.copyWith(status: AppConstants.statusApproved);
-        await _dbService.updatePrisoner(updatedPrisoner);
+        await _firestoreService.updatePrisonerStatus(
+          prisoner.id.toString(),
+          AppConstants.statusApproved,
+          null,
+        );
         _loadPrisoners();
         
         if (mounted) {
@@ -138,7 +141,7 @@ class _AdminPrisonersManagementScreenState
 
     if (confirmed == true) {
       try {
-        await _dbService.deletePrisoner(prisoner.id!);
+        await _firestoreService.deletePrisoner(prisoner.id.toString());
         _loadPrisoners();
         
         if (mounted) {

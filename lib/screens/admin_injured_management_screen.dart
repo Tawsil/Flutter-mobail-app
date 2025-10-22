@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../models/injured.dart';
-import '../services/database_service.dart';
+import '../services/firestore_service.dart';
 import '../widgets/custom_dialogs.dart';
 import '../widgets/info_card.dart';
 
@@ -16,7 +16,7 @@ class AdminInjuredManagementScreen extends StatefulWidget {
 
 class _AdminInjuredManagementScreenState
     extends State<AdminInjuredManagementScreen> {
-  final DatabaseService _dbService = DatabaseService();
+  final FirestoreService _firestoreService = FirestoreService();
   List<Injured> _injured = [];
   List<Injured> _filteredInjured = [];
   bool _isLoading = true;
@@ -40,7 +40,7 @@ class _AdminInjuredManagementScreenState
   Future<void> _loadInjured() async {
     try {
       setState(() => _isLoading = true);
-      final injured = await _dbService.getAllInjured();
+      final injured = await _firestoreService.getAllInjured();
       setState(() {
         _injured = injured;
         _applyFilters();
@@ -101,8 +101,11 @@ class _AdminInjuredManagementScreenState
 
     if (confirmed == true) {
       try {
-        final updatedInjured = injured.copyWith(status: AppConstants.statusApproved);
-        await _dbService.updateInjured(updatedInjured);
+        await _firestoreService.updateInjuredStatus(
+          injured.id.toString(),
+          AppConstants.statusApproved,
+          null,
+        );
         _loadInjured();
         
         if (mounted) {
@@ -138,7 +141,7 @@ class _AdminInjuredManagementScreenState
 
     if (confirmed == true) {
       try {
-        await _dbService.deleteInjured(injured.id!);
+        await _firestoreService.deleteInjured(injured.id.toString());
         _loadInjured();
         
         if (mounted) {

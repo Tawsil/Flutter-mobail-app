@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../models/injured.dart';
-import '../services/database_service.dart';
+import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import '../services/file_service.dart';
 
@@ -41,7 +41,7 @@ class _AddInjuredScreenState extends State<AddInjuredScreen> {
   File? _cvFile;
 
   // الخدمات
-  final DatabaseService _dbService = DatabaseService();
+  final FirestoreService _firestoreService = FirestoreService();
   final AuthService _authService = AuthService();
   final FileService _fileService = FileService();
 
@@ -228,9 +228,9 @@ class _AddInjuredScreenState extends State<AddInjuredScreen> {
         createdAt: DateTime.now(),
       );
 
-      await _dbService.insertInjured(injured);
+      await _firestoreService.insertInjured(injured);
 
-      _showSuccessMessage('تم إرسال بيانات الجريح بنجاح! سيتم مراجعتها من قبل المسؤول.');
+      _showSuccessMessage('تم إرسال بيانات الجريح بنجاح إلى السحابة! سيتم مراجعتها من قبل المسؤول.');
 
       // العودة للصفحة السابقة
       Navigator.of(context).pop();

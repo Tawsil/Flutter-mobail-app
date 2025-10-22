@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../services/auth_service.dart';
-import '../services/database_service.dart';
+import '../services/firestore_service.dart';
 import 'login_screen.dart';
 import 'admin_martyrs_management_screen.dart';
 import 'admin_injured_management_screen.dart';
@@ -19,7 +19,7 @@ class AdminDashboardScreen extends StatefulWidget {
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   final AuthService _authService = AuthService();
-  final DatabaseService _dbService = DatabaseService();
+  final FirestoreService _firestoreService = FirestoreService();
   
   String? _adminName;
   Map<String, int> _statistics = {};
@@ -34,7 +34,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Future<void> _loadDashboardData() async {
     try {
       final adminName = await _authService.getCurrentUserName();
-      final stats = await _dbService.getStatistics();
+      final stats = await _firestoreService.getStatistics();
       
       if (mounted) {
         setState(() {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../models/martyr.dart';
-import '../services/database_service.dart';
+import '../services/firestore_service.dart';
 import '../widgets/custom_dialogs.dart';
 import '../widgets/info_card.dart';
 
@@ -16,7 +16,7 @@ class AdminMartyrsManagementScreen extends StatefulWidget {
 
 class _AdminMartyrsManagementScreenState
     extends State<AdminMartyrsManagementScreen> {
-  final DatabaseService _dbService = DatabaseService();
+  final FirestoreService _firestoreService = FirestoreService();
   List<Martyr> _martyrs = [];
   List<Martyr> _filteredMartyrs = [];
   bool _isLoading = true;
@@ -40,7 +40,7 @@ class _AdminMartyrsManagementScreenState
   Future<void> _loadMartyrs() async {
     try {
       setState(() => _isLoading = true);
-      final martyrs = await _dbService.getAllMartyrs();
+      final martyrs = await _firestoreService.getAllMartyrs();
       setState(() {
         _martyrs = martyrs;
         _applyFilters();
@@ -101,8 +101,11 @@ class _AdminMartyrsManagementScreenState
 
     if (confirmed == true) {
       try {
-        final updatedMartyr = martyr.copyWith(status: AppConstants.statusApproved);
-        await _dbService.updateMartyr(updatedMartyr);
+        await _firestoreService.updateMartyrStatus(
+          martyr.id.toString(),
+          AppConstants.statusApproved,
+          null,
+        );
         _loadMartyrs();
         
         if (mounted) {
@@ -138,7 +141,7 @@ class _AdminMartyrsManagementScreenState
 
     if (confirmed == true) {
       try {
-        await _dbService.deleteMartyr(martyr.id!);
+        await _firestoreService.deleteMartyr(martyr.id.toString());
         _loadMartyrs();
         
         if (mounted) {
