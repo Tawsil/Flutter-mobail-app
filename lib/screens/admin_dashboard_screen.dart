@@ -134,13 +134,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         centerTitle: true,
         backgroundColor: AppColors.primaryGreen,
         elevation: 4,
-        leading: IconButton(
-          onPressed: () => Scaffold.of(context).openEndDrawer(),
-          icon: const Icon(
-            Icons.menu,
-            color: AppColors.primaryWhite,
+        leading: Builder(
+          builder: (context) => IconButton(
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
+            icon: const Icon(
+              Icons.menu,
+              color: AppColors.primaryWhite,
+            ),
+            tooltip: 'القائمة الجانبية',
           ),
-          tooltip: 'القائمة الجانبية',
         ),
         actions: [
           IconButton(
@@ -189,8 +191,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                       // ترحيب بالمسؤول
                       Container(
                         width: double.infinity,
@@ -327,7 +331,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             ),
                             const SizedBox(height: 16),
                             ElevatedButton(
-                              onPressed: () => Scaffold.of(context).openEndDrawer(),
+                              onPressed: () {
+                                Scaffold.of(context).openEndDrawer();
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primaryWhite,
                                 foregroundColor: AppColors.primaryGreen,
@@ -388,6 +394,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   ),
                 ),
               ),
+            ),
             ),
     );
   }
