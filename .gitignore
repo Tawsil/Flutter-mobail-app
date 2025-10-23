@@ -18,7 +18,7 @@
 **/downloads/
 **/eggs/
 **/.eggs/
-**/lib/
+# **/lib/  # Don't ignore lib directory for Flutter projects
 **/lib64/
 **/parts/
 **/sdist/

@@ -289,11 +289,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          gradient: AppColors.secondaryGradient,
+                          gradient: AppColors.primaryGradient,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.secondaryBlue.withOpacity(0.3),
+                              color: AppColors.info.withOpacity(0.3),
                               blurRadius: 10,
                               offset: const Offset(0, 5),
                             ),
@@ -330,7 +330,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                               onPressed: () => Scaffold.of(context).openEndDrawer(),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primaryWhite,
-                                foregroundColor: AppColors.secondaryBlue,
+                                foregroundColor: AppColors.primaryGreen,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 32,
                                   vertical: 12,
