@@ -134,6 +134,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         centerTitle: true,
         backgroundColor: AppColors.primaryGreen,
         elevation: 4,
+        leading: IconButton(
+          onPressed: () => Scaffold.of(context).openEndDrawer(),
+          icon: const Icon(
+            Icons.menu,
+            color: AppColors.primaryWhite,
+          ),
+          tooltip: 'القائمة الجانبية',
+        ),
         actions: [
           IconButton(
             onPressed: () {
@@ -160,6 +168,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
         ],
       ),
+      endDrawer: _buildDrawer(),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(
@@ -275,63 +284,75 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       ),
                       const SizedBox(height: 32),
 
-                      // قائمة الإدارة
-                      Expanded(
-                        child: ListView(
+                      // زر فتح القائمة الجانبية
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: AppColors.secondaryGradient,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.secondaryBlue.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Column(
                           children: [
-                            _buildManagementCard(
-                              title: 'إدارة الشهداء',
-                              subtitle: 'مراجعة وتوثيق بيانات الشهداء',
-                              icon: Icons.person_off_outlined,
-                              color: AppColors.primaryRed,
-                              onTap: () => _navigateToManagement('الشهداء'),
+                            const Icon(
+                              Icons.menu,
+                              size: 48,
+                              color: AppColors.primaryWhite,
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'اضغط على القائمة الجانبية لإدارة البيانات',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryWhite,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'إدارة الشهداء والجرحى والأسرى والمستخدمين والإعدادات',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.primaryWhite,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 16),
-
-                            _buildManagementCard(
-                              title: 'إدارة الجرحى',
-                              subtitle: 'مراجعة وتوثيق بيانات الجرحى',
-                              icon: Icons.healing_outlined,
-                              color: AppColors.warning,
-                              onTap: () => _navigateToManagement('الجرحى'),
-                            ),
-                            const SizedBox(height: 16),
-
-                            _buildManagementCard(
-                              title: 'إدارة الأسرى',
-                              subtitle: 'مراجعة وتوثيق بيانات الأسرى',
-                              icon: Icons.lock_person_outlined,
-                              color: AppColors.earthBrown,
-                              onTap: () => _navigateToManagement('الأسرى'),
-                            ),
-                            const SizedBox(height: 16),
-
-                            _buildManagementCard(
-                              title: 'إدارة المستخدمين',
-                              subtitle: 'إدارة حسابات المستخدمين',
-                              icon: Icons.people_outlined,
-                              color: AppColors.primaryGreen,
-                              onTap: () => _navigateToManagement('المستخدمين'),
-                            ),
-                            const SizedBox(height: 16),
-
-                            _buildManagementCard(
-                              title: 'الإعدادات',
-                              subtitle: 'إعدادات التطبيق والحساب',
-                              icon: Icons.settings,
-                              color: AppColors.info,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const AdminSettingsScreen(),
-                                  ),
-                                );
-                              },
+                            ElevatedButton(
+                              onPressed: () => Scaffold.of(context).openEndDrawer(),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primaryWhite,
+                                foregroundColor: AppColors.secondaryBlue,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: const Text(
+                                'فتح القائمة الجانبية',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ),
+
+                      const SizedBox(height: 32),
 
                       // ملاحظة
                       Container(
@@ -368,6 +389,252 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ),
               ),
             ),
+    );
+  }
+
+  Widget _buildDrawer() {
+    return Drawer(
+      width: 320,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.primaryGreen.withOpacity(0.9),
+              AppColors.primaryWhite,
+            ],
+          ),
+        ),
+        child: Column(
+          children: [
+            // رأس القائمة
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+              ),
+              child: Column(
+                children: [
+                  const CircleAvatar(
+                    radius: 40,
+                    backgroundColor: AppColors.primaryWhite,
+                    child: Icon(
+                      Icons.admin_panel_settings,
+                      size: 40,
+                      color: AppColors.primaryGreen,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    _adminName ?? 'المسؤول',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryWhite,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Administrator',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.primaryWhite,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // قائمة الإدارة
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: [
+                  const SizedBox(height: 20),
+
+                  _buildDrawerItem(
+                    title: 'إدارة الشهداء',
+                    subtitle: 'مراجعة وتوثيق بيانات الشهداء',
+                    icon: Icons.person_off_outlined,
+                    color: AppColors.primaryRed,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToManagement('الشهداء');
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  _buildDrawerItem(
+                    title: 'إدارة الجرحى',
+                    subtitle: 'مراجعة وتوثيق بيانات الجرحى',
+                    icon: Icons.healing_outlined,
+                    color: AppColors.warning,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToManagement('الجرحى');
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  _buildDrawerItem(
+                    title: 'إدارة الأسرى',
+                    subtitle: 'مراجعة وتوثيق بيانات الأسرى',
+                    icon: Icons.lock_person_outlined,
+                    color: AppColors.earthBrown,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToManagement('الأسرى');
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  _buildDrawerItem(
+                    title: 'إدارة المستخدمين',
+                    subtitle: 'إدارة حسابات المستخدمين',
+                    icon: Icons.people_outlined,
+                    color: AppColors.primaryGreen,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToManagement('المستخدمين');
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  _buildDrawerItem(
+                    title: 'الإعدادات',
+                    subtitle: 'إعدادات التطبيق والحساب',
+                    icon: Icons.settings,
+                    color: AppColors.info,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminSettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            // زر تسجيل الخروج
+            Container(
+              margin: const EdgeInsets.all(16),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _logout();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.error,
+                  foregroundColor: AppColors.primaryWhite,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.logout),
+                    SizedBox(width: 8),
+                    Text(
+                      'تسجيل الخروج',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withOpacity(0.1),
+                color.withOpacity(0.05),
+              ],
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: 24,
+                  color: AppColors.primaryWhite,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_back_ios,
+                color: color,
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
