@@ -12,6 +12,10 @@ import 'admin_settings_screen.dart';
 import 'add_martyr_screen.dart';
 import 'add_injured_screen.dart';
 import 'add_prisoner_screen.dart';
+import 'advanced_search_screen.dart';
+import 'favorites_screen.dart';
+import 'statistics_screen.dart';
+import 'backup_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({Key? key}) : super(key: key);
@@ -289,7 +293,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // بطاقات الإحصائيات
+                      // بطاقات الإحصائيات الأساسية
                       Row(
                         children: [
                           Expanded(
@@ -330,6 +334,89 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                               count: _statistics['pending'] ?? 0,
                               icon: Icons.pending_outlined,
                               color: AppColors.info,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      // بطاقات الميزات المميزة
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildFeatureCard(
+                              title: 'المفضلة',
+                              subtitle: 'عناصر مختارة',
+                              icon: Icons.favorite,
+                              color: const Color(0xFFE91E63),
+                              count: 0, // سيتم جلب العدد الحقيقي لاحقاً
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const FavoritesScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildFeatureCard(
+                              title: 'البحث',
+                              subtitle: 'بحث متقدم',
+                              icon: Icons.search,
+                              color: const Color(0xFF2196F3),
+                              count: 0,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AdvancedSearchScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildFeatureCard(
+                              title: 'الإحصائيات',
+                              subtitle: 'تحليلات ذكية',
+                              icon: Icons.analytics,
+                              color: const Color(0xFF9C27B0),
+                              count: 0,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const StatisticsScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildFeatureCard(
+                              title: 'النسخ الاحتياطي',
+                              subtitle: 'حماية البيانات',
+                              icon: Icons.backup,
+                              color: const Color(0xFF607D8B),
+                              count: 0,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const BackupScreen(),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ],
@@ -532,6 +619,114 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       onTap: () {
                         Navigator.pop(context);
                         _navigateToAddForm(AppConstants.sectionPrisoners);
+                      },
+                    ),
+                    
+                    // فاصل
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 20),
+                      height: 1,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFF2E7D32),
+                            Color(0xFF4CAF50),
+                          ],
+                        ),
+                      ),
+                    ),
+                    
+                    // قسم الميزات المميزة
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.stars_outlined,
+                            color: Color(0xFFFF6F00),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'الميزات المميزة',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFFFF6F00),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // البحث المتقدم
+                    _buildMenuItem(
+                      title: 'البحث المتقدم',
+                      subtitle: 'بحث ذكي مع فلاتر متقدمة',
+                      icon: Icons.search,
+                      color: const Color(0xFF2196F3),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AdvancedSearchScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // المفضلة السريع
+                    _buildMenuItem(
+                      title: 'المفضلة السريع',
+                      subtitle: 'وصول سريع للعناصر المهمة',
+                      icon: Icons.favorite,
+                      color: const Color(0xFFE91E63),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FavoritesScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // الإحصائيات والتحليلات
+                    _buildMenuItem(
+                      title: 'الإحصائيات والتحليلات',
+                      subtitle: 'تقارير مرئية ورؤى ذكية',
+                      icon: Icons.analytics,
+                      color: const Color(0xFF9C27B0),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const StatisticsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // النسخ الاحتياطي الذكي
+                    _buildMenuItem(
+                      title: 'النسخ الاحتياطي',
+                      subtitle: 'حماية ذكية ونسخ احتياطية تلقائية',
+                      icon: Icons.backup,
+                      color: const Color(0xFF607D8B),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const BackupScreen(),
+                          ),
+                        );
                       },
                     ),
                     
@@ -954,6 +1149,69 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             textAlign: TextAlign.center,
           ),
         ],
+      ),
+    );
+  }
+
+  /// بناء بطاقة ميزة مميزة
+  Widget _buildFeatureCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required int count,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.primaryWhite,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+          border: Border.all(
+            color: color.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              size: 28,
+              color: color,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 11,
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
