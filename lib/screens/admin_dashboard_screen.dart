@@ -125,7 +125,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return Directionality(
       textDirection: TextDirection.rtl, // ضمان اتجاه RTL للعربية
       child: Scaffold(
-      appBar: AppBar(
+        appBar: AppBar(
         title: const Text(
           'لوحة التحكم الإدارية',
           style: TextStyle(
