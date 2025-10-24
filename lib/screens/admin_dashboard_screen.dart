@@ -450,6 +450,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   Widget _buildDrawer() {
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+    final ThemeData theme = Theme.of(context);
     
     return Directionality(
       textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
@@ -529,7 +530,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ),
               ),
 
-            // قائمة الإدارة - الألوان الأصلية
+            // قائمة الإدارة - ألوان داكنة ديناميكية حسب إعدادات الألوان
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -538,8 +539,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     title: 'إدارة الشهداء',
                     subtitle: 'مراجعة وتوثيق بيانات الشهداء',
                     icon: Icons.do_not_disturb_alt,
-                    cardColor: AppColors.primaryRed.withOpacity(0.1),
-                    iconColor: AppColors.primaryRed,
+                    baseColor: AppColors.primaryRed,
                     onTap: () {
                       Navigator.pop(context);
                       _navigateToManagement('الشهداء');
@@ -551,8 +551,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     title: 'إدارة الجرحى',
                     subtitle: 'مراجعة وتوثيق بيانات الجرحى',
                     icon: Icons.medical_services_outlined,
-                    cardColor: AppColors.warning.withOpacity(0.1),
-                    iconColor: AppColors.warning,
+                    baseColor: AppColors.warning,
                     onTap: () {
                       Navigator.pop(context);
                       _navigateToManagement('الجرحى');
@@ -564,8 +563,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     title: 'إدارة الأسرى',
                     subtitle: 'مراجعة وتوثيق بيانات الأسرى',
                     icon: Icons.lock_person_outlined,
-                    cardColor: AppColors.earthBrown.withOpacity(0.1),
-                    iconColor: AppColors.earthBrown,
+                    baseColor: AppColors.earthBrown,
                     onTap: () {
                       Navigator.pop(context);
                       _navigateToManagement('الأسرى');
@@ -577,8 +575,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     title: 'إدارة المستخدمين',
                     subtitle: 'إدارة حسابات المستخدمين',
                     icon: Icons.group_outlined,
-                    cardColor: AppColors.primaryGreen.withOpacity(0.1),
-                    iconColor: AppColors.primaryGreen,
+                    baseColor: AppColors.primaryGreen,
                     onTap: () {
                       Navigator.pop(context);
                       _navigateToManagement('المستخدمين');
@@ -590,8 +587,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     title: 'الإعدادات',
                     subtitle: 'إعدادات التطبيق والحساب',
                     icon: Icons.settings,
-                    cardColor: AppColors.info.withOpacity(0.1),
-                    iconColor: AppColors.info,
+                    baseColor: AppColors.info,
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -606,7 +602,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
             ),
 
-            // زر تسجيل الخروج - لون أحمر أصلي
+            // زر تسجيل الخروج - لون أحمر ديناميكي
             Container(
               margin: const EdgeInsets.all(16),
               child: ElevatedButton(
@@ -621,6 +617,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  elevation: theme.brightness == Brightness.dark ? 4 : 2,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -651,11 +648,21 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     required String title,
     required String subtitle,
     required IconData icon,
-    required Color cardColor,
-    required Color iconColor,
+    required Color baseColor,
     required VoidCallback onTap,
   }) {
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+    final ThemeData theme = Theme.of(context);
+    
+    // ألوان داكنة ديناميكية حسب الوضع (فاتح/داكن)
+    final Color darkColor = baseColor;
+    final Color cardBackground = theme.brightness == Brightness.dark 
+        ? darkColor 
+        : darkColor.withOpacity(0.1);
+    final Color textColor = theme.brightness == Brightness.dark 
+        ? AppColors.primaryWhite 
+        : darkColor;
+    final Color iconColor = darkColor;
     
     return Card(
       elevation: 6,
@@ -672,10 +679,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                cardColor,
-                cardColor.withOpacity(0.9),
-              ],
+              colors: theme.brightness == Brightness.dark
+                  ? [
+                      darkColor,
+                      darkColor.withOpacity(0.85),
+                    ]
+                  : [
+                      baseColor.withOpacity(0.1),
+                      baseColor.withOpacity(0.05),
+                    ],
             ),
           ),
           child: Row(
@@ -685,7 +697,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               if (isRtl) ...[
                 Icon(
                   Icons.chevron_left,
-                  color: iconColor,
+                  color: textColor,
                   size: 18,
                 ),
                 const SizedBox(width: 16),
@@ -701,7 +713,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: iconColor,
+                        color: textColor,
                       ),
                       textAlign: isRtl ? TextAlign.right : TextAlign.left,
                     ),
@@ -710,7 +722,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       subtitle,
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: theme.brightness == Brightness.dark
+                            ? AppColors.primaryWhite.withOpacity(0.7)
+                            : AppColors.textSecondary,
                       ),
                       textAlign: isRtl ? TextAlign.right : TextAlign.left,
                     ),
@@ -727,6 +741,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 decoration: BoxDecoration(
                   color: iconColor,
                   shape: BoxShape.circle,
+                  boxShadow: theme.brightness == Brightness.dark
+                      ? [
+                          BoxShadow(
+                            color: iconColor.withOpacity(0.4),
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ]
+                      : [],
                 ),
                 child: Icon(
                   icon,
@@ -740,7 +763,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 const SizedBox(width: 16),
                 Icon(
                   Icons.chevron_right,
-                  color: iconColor,
+                  color: textColor,
                   size: 18,
                 ),
               ],
