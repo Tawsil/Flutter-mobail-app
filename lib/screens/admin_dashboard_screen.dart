@@ -122,7 +122,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Directionality(
+      textDirection: TextDirection.rtl, // ضمان اتجاه RTL للعربية
+      child: Scaffold(
       appBar: AppBar(
         title: const Text(
           'لوحة التحكم الإدارية',
@@ -396,6 +398,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
             ),
             ),
+      ),
     );
   }
 
