@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:fl_chart/fl_chart.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../services/statistics_service.dart';
@@ -30,6 +30,20 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   
   // الخدمات
   final StatisticsService _statisticsService = StatisticsService();
+
+  // fl_chart data structures
+  class TimeSeriesPoint {
+    final double x;
+    final double y;
+    TimeSeriesPoint(this.x, this.y);
+  }
+
+  class PieData {
+    final String title;
+    final double value;
+    final Color color;
+    PieData(this.title, this.value, this.color);
+  }
 
   @override
   void initState() {
@@ -663,27 +677,90 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   Widget _buildChart() {
     // بيانات وهمية للعرض - في التطبيق الحقيقي ستأتي من قاعدة البيانات
     final data = [
-      _TimeSeriesData(DateTime(2025, 1), 10),
-      _TimeSeriesData(DateTime(2025, 2), 25),
-      _TimeSeriesData(DateTime(2025, 3), 15),
-      _TimeSeriesData(DateTime(2025, 4), 30),
-      _TimeSeriesData(DateTime(2025, 5), 20),
-      _TimeSeriesData(DateTime(2025, 6), 35),
+      TimeSeriesPoint(1, 10),
+      TimeSeriesPoint(2, 25),
+      TimeSeriesPoint(3, 15),
+      TimeSeriesPoint(4, 30),
+      TimeSeriesPoint(5, 20),
+      TimeSeriesPoint(6, 35),
     ];
 
-    return charts.TimeSeriesChart(
-      [
-        charts.Series<_TimeSeriesData, DateTime>(
-          id: 'القيمة',
-          colorFn: (_, __) => charts.ColorUtil.fromDartColor(AppColors.primaryColor),
-          domainFn: (_TimeSeriesData sales, _) => sales.time,
-          measureFn: (_TimeSeriesData sales, _) => sales.value,
-          data: data,
+    return LineChart(
+      LineChartData(
+        titlesData: FlTitlesData(
+          show: true,
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 30,
+              interval: 1,
+              getTitlesWidget: (value, meta) {
+                return SideTitleWidget(
+                  axisSide: meta.axisSide,
+                  child: Text('${value.toInt()}'),
+                );
+              },
+            ),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: 5,
+              getTitlesWidget: (value, meta) {
+                return SideTitleWidget(
+                  axisSide: meta.axisSide,
+                  child: Text('${value.toInt()}'),
+                );
+              },
+              reservedSize: 30,
+            ),
+          ),
         ),
-      ],
-      animate: true,
-      primaryMeasureAxis: const charts.NumericAxisSpec(
-        tickProviderSpec: charts.BasicNumericTickProviderSpec(desiredTickCount: 5),
+        borderData: FlBorderData(
+          show: true,
+          border: Border.all(
+            color: AppColors.borderColor,
+            width: 1,
+          ),
+        ),
+        minX: 0,
+        maxX: 7,
+        minY: 0,
+        maxY: 40,
+        lineTouchData: LineTouchData(
+          enabled: true,
+        ),
+        lineBarsData: [
+          LineChartBarData(
+            spots: data.map((point) => FlSpot(point.x, point.y)).toList(),
+            isCurved: true,
+            color: AppColors.primaryColor,
+            barWidth: 3,
+            isStrokeCapRound: true,
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, barData, index) {
+                return FlDotCirclePainter(
+                  radius: 4,
+                  color: AppColors.primaryColor,
+                  strokeWidth: 2,
+                  strokeColor: Colors.white,
+                );
+              },
+            ),
+            belowBarData: BarAreaData(
+              show: true,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.primaryColor.withOpacity(0.3),
+                  AppColors.primaryColor.withOpacity(0.05),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -851,21 +928,35 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   Widget _buildPieChart() {
     // بيانات وهمية للعرض
     final data = [
-      _PieData('قطاع غزة', 35, Colors.red),
-      _PieData('الضفة الغربية', 40, Colors.blue),
-      _PieData('القدس', 15, Colors.green),
-      _PieData('مناطق أخرى', 10, Colors.orange),
+      PieData('قطاع غزة', 35, Colors.red),
+      PieData('الضفة الغربية', 40, Colors.blue),
+      PieData('القدس', 15, Colors.green),
+      PieData('مناطق أخرى', 10, Colors.orange),
     ];
 
-    return charts.PieChart(
-      data.map((item) => charts.Series<_PieData, String>(
-        id: 'Distribution',
-        data: [item],
-        domainFn: (_PieData item, _) => item.label,
-        measureFn: (_PieData item, _) => item.value,
-        colorFn: (_PieData item, _) => charts.ColorUtil.fromDartColor(item.color),
-      )).toList(),
-      animate: true,
+    return PieChart(
+      PieChartData(
+        sections: data.map((item) => PieChartSectionData(
+          color: item.color,
+          value: item.value.toDouble(),
+          title: '${item.value}%',
+          radius: 100,
+          titleStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          titlePositionPercentageOffset: 0.5,
+        )).toList(),
+        centerSpaceRadius: 40,
+        sectionsSpace: 2,
+        borderData: FlBorderData(
+          show: false,
+        ),
+        pieTouchData: PieTouchData(
+          enabled: true,
+        ),
+      ),
     );
   }
 
@@ -1696,17 +1787,4 @@ class _StatisticsScreenState extends State<StatisticsScreen>
 
 // فئات البيانات المساعدة
 
-class _TimeSeriesData {
-  final DateTime time;
-  final int value;
-
-  _TimeSeriesData(this.time, this.value);
-}
-
-class _PieData {
-  final String label;
-  final int value;
-  final Color color;
-
-  _PieData(this.label, this.value, this.color);
 }
