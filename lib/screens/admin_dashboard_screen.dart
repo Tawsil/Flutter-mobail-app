@@ -34,40 +34,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     _loadDashboardData();
   }
 
-  Future<void> _logout() async {
-    final bool? confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('تسجيل الخروج'),
-        content: const Text(AppConstants.confirmLogout),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('إلغاء'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: AppColors.primaryWhite,
-            ),
-            child: const Text('تسجيل الخروج'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      await _authService.logout();
-      if (mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-          (route) => false,
-        );
-      }
-    }
-  }
-
   Future<void> _loadDashboardData() async {
     try {
       final adminName = await _authService.getCurrentUserName();
@@ -942,32 +908,54 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  /// دالة التنقل لشاشات الإدارة
-  void _navigateToManagement(String section) {
-    Widget? targetScreen;
-    
-    switch (section) {
-      case 'الشهداء':
-        targetScreen = const AdminMartyrsManagementScreen();
-        break;
-      case 'الجرحى':
-        targetScreen = const AdminInjuredManagementScreen();
-        break;
-      case 'الأسرى':
-        targetScreen = const AdminPrisonersManagementScreen();
-        break;
-      case 'المستخدمين':
-        targetScreen = const AdminUsersManagementScreen();
-        break;
-      default:
-        return;
-    }
-    
-    if (targetScreen != null) {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => targetScreen!),
-      );
-    }
+  /// بناء بطاقة إحصائية
+  Widget _buildStatCard({
+    required String title,
+    required int count,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.primaryWhite,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(
+            icon,
+            size: 32,
+            color: color,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            count.toString(),
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 
   /// دالة التنقل لشاشات الإضافة (مثل صفحة المستخدم العادي)
