@@ -34,6 +34,40 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     _loadDashboardData();
   }
 
+  Future<void> _logout() async {
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تسجيل الخروج'),
+        content: const Text(AppConstants.confirmLogout),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.primaryWhite,
+            ),
+            child: const Text('تسجيل الخروج'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await _authService.logout();
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (route) => false,
+        );
+      }
+    }
+  }
+
   Future<void> _loadDashboardData() async {
     try {
       final adminName = await _authService.getCurrentUserName();
@@ -908,539 +942,32 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _buildDrawerOld() { // نسخة قديمة للنتيجة                            child: Icon(
-                              Icons.person,
-                              size: 18,
-                              color: Color(0xFF2E7D32),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    
-                    Text(
-                      _adminName ?? 'المسؤول',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryWhite,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Administrator',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.primaryWhite,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-            // أقسام الإضافة السريعة - مثل صفحة المستخدم العادي
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                children: [
-                  // قسم العنوان
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.add_circle_outline,
-                          color: AppColors.primaryGreen,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'إضافة جديدة',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryGreen,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  // إضافة شهيد
-                  _buildDrawerItem(
-                    title: AppConstants.sectionMartyrs,
-                    subtitle: 'إضافة وتوثيق بيانات شهيد',
-                    icon: Icons.person_off_outlined,
-                    baseColor: AppColors.primaryRed,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _navigateToAddForm(AppConstants.sectionMartyrs);
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // إضافة جريح
-                  _buildDrawerItem(
-                    title: AppConstants.sectionInjured,
-                    subtitle: 'إضافة وتوثيق بيانات جريح',
-                    icon: Icons.medical_services_outlined,
-                    baseColor: AppColors.warning,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _navigateToAddForm(AppConstants.sectionInjured);
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // إضافة أسير
-                  _buildDrawerItem(
-                    title: AppConstants.sectionPrisoners,
-                    subtitle: 'إضافة وتوثيق بيانات أسير',
-                    icon: Icons.lock_person_outlined,
-                    baseColor: AppColors.earthBrown,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _navigateToAddForm(AppConstants.sectionPrisoners);
-                    },
-                  ),
-                  
-                  // فاصل بين أقسام الإضافة والإدارة
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 20),
-                    height: 1,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.primaryGreen.withOpacity(0.3),
-                          AppColors.primaryGreen.withOpacity(0.1),
-                        ],
-                      ),
-                    ),
-                  ),
-                  
-                  // قسم عنوان الإدارة
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.admin_panel_settings,
-                          color: AppColors.info,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'إدارة البيانات',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.info,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  // إدارة الشهداء
-                  _buildDrawerItem(
-                    title: 'إدارة الشهداء',
-                    subtitle: 'مراجعة وتوثيق بيانات الشهداء',
-                    icon: Icons.do_not_disturb_alt,
-                    baseColor: AppColors.primaryRed,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _navigateToManagement('الشهداء');
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  _buildDrawerItem(
-                    title: 'إدارة الجرحى',
-                    subtitle: 'مراجعة وتوثيق بيانات الجرحى',
-                    icon: Icons.medical_services_outlined,
-                    baseColor: AppColors.warning,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _navigateToManagement('الجرحى');
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  _buildDrawerItem(
-                    title: 'إدارة الأسرى',
-                    subtitle: 'مراجعة وتوثيق بيانات الأسرى',
-                    icon: Icons.lock_person_outlined,
-                    baseColor: AppColors.earthBrown,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _navigateToManagement('الأسرى');
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  _buildDrawerItem(
-                    title: 'إدارة المستخدمين',
-                    subtitle: 'إدارة حسابات المستخدمين',
-                    icon: Icons.group_outlined,
-                    baseColor: AppColors.primaryGreen,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _navigateToManagement('المستخدمين');
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  _buildDrawerItem(
-                    title: 'الإعدادات',
-                    subtitle: 'إعدادات التطبيق والحساب',
-                    icon: Icons.settings,
-                    baseColor: AppColors.info,
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminSettingsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-
-            // زر تسجيل الخروج - لون أحمر ديناميكي
-            Container(
-              margin: const EdgeInsets.all(16),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _logout();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.error,
-                  foregroundColor: AppColors.primaryWhite,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: theme.brightness == Brightness.dark ? 4 : 2,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-                  children: [
-                    // النص أولاً، ثم الأيقونة للـ RTL
-                    Text(
-                      'تسجيل الخروج',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.logout),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      ),
-    );
-  }
-
-  Widget _buildDrawerItem({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required Color baseColor,
-    required VoidCallback onTap,
-  }) {
-    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
-    final ThemeData theme = Theme.of(context);
+  /// دالة التنقل لشاشات الإدارة
+  void _navigateToManagement(String section) {
+    Widget? targetScreen;
     
-    // ألوان داكنة ديناميكية حسب الوضع (فاتح/داكن)
-    final Color darkColor = baseColor;
-    final Color cardBackground = theme.brightness == Brightness.dark 
-        ? darkColor 
-        : darkColor.withOpacity(0.1);
-    final Color textColor = theme.brightness == Brightness.dark 
-        ? AppColors.primaryWhite 
-        : darkColor;
-    final Color iconColor = darkColor;
+    switch (section) {
+      case 'الشهداء':
+        targetScreen = const AdminMartyrsManagementScreen();
+        break;
+      case 'الجرحى':
+        targetScreen = const AdminInjuredManagementScreen();
+        break;
+      case 'الأسرى':
+        targetScreen = const AdminPrisonersManagementScreen();
+        break;
+      case 'المستخدمين':
+        targetScreen = const AdminUsersManagementScreen();
+        break;
+      default:
+        return;
+    }
     
-    return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: theme.brightness == Brightness.dark
-                  ? [
-                      darkColor,
-                      darkColor.withOpacity(0.85),
-                    ]
-                  : [
-                      baseColor.withOpacity(0.1),
-                      baseColor.withOpacity(0.05),
-                    ],
-            ),
-          ),
-          child: Row(
-            textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-            children: [
-              // سهم على اليسار للعربية
-              if (isRtl) ...[
-                Icon(
-                  Icons.chevron_left,
-                  color: textColor,
-                  size: 18,
-                ),
-                const SizedBox(width: 16),
-              ],
-              
-              // النص في الوسط (لليمين للعربية)
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
-                      ),
-                      textAlign: isRtl ? TextAlign.right : TextAlign.left,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.brightness == Brightness.dark
-                            ? AppColors.primaryWhite.withOpacity(0.7)
-                            : AppColors.textSecondary,
-                      ),
-                      textAlign: isRtl ? TextAlign.right : TextAlign.left,
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(width: 16),
-              
-              // أيقونة في دائرة ملونة على اليمين للعربية
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: iconColor,
-                  shape: BoxShape.circle,
-                  boxShadow: theme.brightness == Brightness.dark
-                      ? [
-                          BoxShadow(
-                            color: iconColor.withOpacity(0.4),
-                            blurRadius: 6,
-                            offset: const Offset(0, 3),
-                          ),
-                        ]
-                      : [],
-                ),
-                child: Icon(
-                  icon,
-                  size: 24,
-                  color: AppColors.primaryWhite,
-                ),
-              ),
-              
-              // سهم على اليمين للإنجليزية
-              if (!isRtl) ...[
-                const SizedBox(width: 16),
-                Icon(
-                  Icons.chevron_right,
-                  color: textColor,
-                  size: 18,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard({
-    required String title,
-    required int count,
-    required IconData icon,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.primaryWhite,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            size: 32,
-            color: color,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            count.toString(),
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              color: AppColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildManagementCard({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
-    
-    return Card(
-      elevation: 6,
-      shadowColor: color.withOpacity(0.3),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                color.withOpacity(0.1),
-                color.withOpacity(0.05),
-              ],
-            ),
-          ),
-          child: Row(
-            textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-            children: [
-              if (isRtl) ...[
-                Icon(
-                  Icons.arrow_back_ios,
-                  color: color,
-                  size: 16,
-                ),
-                const SizedBox(width: 12),
-              ],
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  size: 30,
-                  color: AppColors.primaryWhite,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                      ),
-                      textAlign: isRtl ? TextAlign.right : TextAlign.left,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                      ),
-                      textAlign: isRtl ? TextAlign.right : TextAlign.left,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  size: 30,
-                  color: AppColors.primaryWhite,
-                ),
-              ),
-              if (!isRtl) ...[
-                const SizedBox(width: 12),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: color,
-                  size: 16,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
+    if (targetScreen != null) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => targetScreen!),
+      );
+    }
   }
 
   /// دالة التنقل لشاشات الإضافة (مثل صفحة المستخدم العادي)
@@ -1466,3 +993,4 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 }
+
