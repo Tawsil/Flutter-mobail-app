@@ -9,6 +9,9 @@ import 'admin_injured_management_screen.dart';
 import 'admin_prisoners_management_screen.dart';
 import 'admin_users_management_screen.dart';
 import 'admin_settings_screen.dart';
+import 'add_martyr_screen.dart';
+import 'add_injured_screen.dart';
+import 'add_prisoner_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({Key? key}) : super(key: key);
@@ -530,11 +533,112 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ),
               ),
 
-            // قائمة الإدارة - ألوان داكنة ديناميكية حسب إعدادات الألوان
+            // أقسام الإضافة السريعة - مثل صفحة المستخدم العادي
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 children: [
+                  // قسم العنوان
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.add_circle_outline,
+                          color: AppColors.primaryGreen,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'إضافة جديدة',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // إضافة شهيد
+                  _buildDrawerItem(
+                    title: AppConstants.sectionMartyrs,
+                    subtitle: 'إضافة وتوثيق بيانات شهيد',
+                    icon: Icons.person_off_outlined,
+                    baseColor: AppColors.primaryRed,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToAddForm(AppConstants.sectionMartyrs);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // إضافة جريح
+                  _buildDrawerItem(
+                    title: AppConstants.sectionInjured,
+                    subtitle: 'إضافة وتوثيق بيانات جريح',
+                    icon: Icons.medical_services_outlined,
+                    baseColor: AppColors.warning,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToAddForm(AppConstants.sectionInjured);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // إضافة أسير
+                  _buildDrawerItem(
+                    title: AppConstants.sectionPrisoners,
+                    subtitle: 'إضافة وتوثيق بيانات أسير',
+                    icon: Icons.lock_person_outlined,
+                    baseColor: AppColors.earthBrown,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToAddForm(AppConstants.sectionPrisoners);
+                    },
+                  ),
+                  
+                  // فاصل بين أقسام الإضافة والإدارة
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 20),
+                    height: 1,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.primaryGreen.withOpacity(0.3),
+                          AppColors.primaryGreen.withOpacity(0.1),
+                        ],
+                      ),
+                    ),
+                  ),
+                  
+                  // قسم عنوان الإدارة
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.admin_panel_settings,
+                          color: AppColors.info,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'إدارة البيانات',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.info,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // إدارة الشهداء
                   _buildDrawerItem(
                     title: 'إدارة الشهداء',
                     subtitle: 'مراجعة وتوثيق بيانات الشهداء',
@@ -930,6 +1034,29 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  /// دالة التنقل لشاشات الإضافة (مثل صفحة المستخدم العادي)
+  void _navigateToAddForm(String section) {
+    Widget destinationScreen;
+    
+    switch (section) {
+      case AppConstants.sectionMartyrs:
+        destinationScreen = const AddMartyrScreen();
+        break;
+      case AppConstants.sectionInjured:
+        destinationScreen = const AddInjuredScreen();
+        break;
+      case AppConstants.sectionPrisoners:
+        destinationScreen = const AddPrisonerScreen();
+        break;
+      default:
+        return;
+    }
+    
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => destinationScreen),
     );
   }
 }
