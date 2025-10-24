@@ -382,7 +382,7 @@ class StatisticsService {
       case 'increasing':
         return 'زيادة في البيانات بمعدل ${rate.toStringAsFixed(1)}%';
       case 'decreasing':
-        return 'انخفاض في البيانات بمعدل ${math.abs(rate).toStringAsFixed(1)}%';
+        return 'انخفاض في البيانات بمعدل ${rate.abs().toStringAsFixed(1)}%';
       default:
         return 'استقرار في مستوى البيانات';
     }

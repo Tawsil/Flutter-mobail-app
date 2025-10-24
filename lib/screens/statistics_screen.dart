@@ -13,6 +13,20 @@ class StatisticsScreen extends StatefulWidget {
   State<StatisticsScreen> createState() => _StatisticsScreenState();
 }
 
+// fl_chart data structures
+class TimeSeriesPoint {
+  final double x;
+  final double y;
+  TimeSeriesPoint(this.x, this.y);
+}
+
+class PieData {
+  final String title;
+  final double value;
+  final Color color;
+  PieData(this.title, this.value, this.color);
+}
+
 class _StatisticsScreenState extends State<StatisticsScreen>
     with TickerProviderStateMixin {
   
@@ -30,20 +44,6 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   
   // الخدمات
   final StatisticsService _statisticsService = StatisticsService();
-
-  // fl_chart data structures
-  class TimeSeriesPoint {
-    final double x;
-    final double y;
-    TimeSeriesPoint(this.x, this.y);
-  }
-
-  class PieData {
-    final String title;
-    final double value;
-    final Color color;
-    PieData(this.title, this.value, this.color);
-  }
 
   @override
   void initState() {
@@ -696,7 +696,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
               interval: 1,
               getTitlesWidget: (value, meta) {
                 return SideTitleWidget(
-                  axisSide: meta.axisSide,
+                  axisPosition: meta.axisPosition,
                   child: Text('${value.toInt()}'),
                 );
               },
@@ -708,7 +708,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
               interval: 5,
               getTitlesWidget: (value, meta) {
                 return SideTitleWidget(
-                  axisSide: meta.axisSide,
+                  axisPosition: meta.axisPosition,
                   child: Text('${value.toInt()}'),
                 );
               },
