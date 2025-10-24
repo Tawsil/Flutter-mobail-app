@@ -5,6 +5,7 @@ import '../widgets/custom_dialogs.dart';
 import '../widgets/info_card.dart';
 import '../services/backup_service.dart';
 import '../services/theme_service.dart';
+import '../l10n/app_localizations.dart';
 
 class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({Key? key}) : super(key: key);
@@ -16,6 +17,9 @@ class AppSettingsScreen extends StatefulWidget {
 class _AppSettingsScreenState extends State<AppSettingsScreen> {
   final BackupService _backupService = BackupService();
   final ThemeService _themeService = ThemeService();
+  
+  // Localization variables
+  AppLocalizations? _localization;
   
   bool _notificationsEnabled = true;
   bool _dailyNotifications = true;
@@ -36,17 +40,19 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
+    final localization = AppLocalizations.of(context);
     setState(() {
+      _localization = localization;
       _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
       _dailyNotifications = prefs.getBool('daily_notifications') ?? true;
       _weeklyNotifications = prefs.getBool('weekly_notifications') ?? true;
       _securityNotifications = prefs.getBool('security_notifications') ?? true;
       _autoBackup = prefs.getBool('auto_backup') ?? false;
-      _backupFrequency = prefs.getString('backup_frequency') ?? 'أسبوعياً';
+      _backupFrequency = prefs.getString('backup_frequency') ?? (localization?.arabic ?? 'العربية');
       _biometricAuth = prefs.getBool('biometric_auth') ?? false;
       _appLock = prefs.getBool('app_lock') ?? false;
-      _appTheme = prefs.getString('app_theme') ?? 'النظام';
-      _language = prefs.getString('language') ?? 'العربية';
+      _appTheme = prefs.getString('app_theme') ?? (localization?.systemMode ?? 'النظام');
+      _language = prefs.getString('language') ?? (localization?.arabic ?? 'العربية');
     });
   }
 
@@ -293,9 +299,9 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'إعدادات التطبيق',
-          style: TextStyle(
+        title: Text(
+          _localization?.appSettings ?? 'إعدادات التطبيق',
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: AppColors.primaryWhite,
           ),
@@ -491,7 +497,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
               ),
               const Divider(height: 1),
               ListTile(
-                title: const Text('لغة التطبيق'),
+                title: Text(_localization?.appLanguage ?? 'لغة التطبيق'),
                 subtitle: Text(_language),
                 trailing: DropdownButton<String>(
                   value: _language,
@@ -500,12 +506,30 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                     await _saveSetting('language', value);
                     // تحديث اللغة فوراً
                     await _themeService.saveLanguage(value!);
+                    
+                    // عرض رسالة نجاح
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            _localization?.success ?? 'تم حفظ الإعدادات بنجاح'
+                          ),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    }
                   },
-                  items: ['العربية', 'English']
-                      .map((lang) => DropdownMenuItem(
-                            value: lang,
-                            child: Text(lang),
-                          ))
+                  items: [
+                    DropdownMenuItem(
+                      value: _localization?.arabic ?? 'العربية',
+                      child: Text(_localization?.arabic ?? 'العربية'),
+                    ),
+                    DropdownMenuItem(
+                      value: _localization?.english ?? 'English',
+                      child: Text(_localization?.english ?? 'English'),
+                    ),
+                  ]
+                      .where((item) => item.value != null)
                       .toList(),
                 ),
               ),

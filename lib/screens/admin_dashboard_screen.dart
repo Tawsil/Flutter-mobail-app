@@ -3,6 +3,7 @@ import '../constants/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
+import '../l10n/app_localizations.dart';
 import 'login_screen.dart';
 import 'admin_martyrs_management_screen.dart';
 import 'admin_injured_management_screen.dart';
@@ -24,6 +25,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   final AuthService _authService = AuthService();
   final FirestoreService _firestoreService = FirestoreService();
   
+  // Localization variables
+  AppLocalizations? _localization;
+  
   String? _adminName;
   Map<String, int> _statistics = {};
   bool _isLoading = true;
@@ -36,11 +40,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   Future<void> _loadDashboardData() async {
     try {
+      final localization = AppLocalizations.of(context);
       final adminName = await _authService.getCurrentUserName();
       final stats = await _firestoreService.getStatistics();
       
       if (mounted) {
         setState(() {
+          _localization = localization;
           _adminName = adminName;
           _statistics = stats;
           _isLoading = false;
@@ -48,6 +54,18 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       }
     } catch (e) {
       if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_localization?.error ?? 'حدث خطأ في تحميل البيانات'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
         setState(() {
           _isLoading = false;
         });
@@ -130,9 +148,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'لوحة التحكم الإدارية',
-          style: TextStyle(
+        title: Text(
+          _localization?.adminDashboard ?? 'لوحة تحكم المسؤول',
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: AppColors.primaryWhite,
           ),
@@ -499,8 +517,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     
                     // إضافة شهيد
                     _buildMenuItem(
-                      title: 'إضافة شهيد',
-                      subtitle: 'إضافة وتوثيق بيانات شهيد',
+                      title: _localization?.addMartyr ?? 'إضافة شهيد',
+                      subtitle: _localization?.settings ?? 'إضافة وتوثيق بيانات شهيد',
                       icon: Icons.person_off_outlined,
                       color: const Color(0xFF8B0000),
                       onTap: () {
@@ -512,8 +530,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     
                     // إضافة جريح
                     _buildMenuItem(
-                      title: 'إضافة جريح',
-                      subtitle: 'إضافة وتوثيق بيانات جريح',
+                      title: _localization?.addInjured ?? 'إضافة جريح',
+                      subtitle: _localization?.settings ?? 'إضافة وتوثيق بيانات جريح',
                       icon: Icons.medical_services_outlined,
                       color: const Color(0xFFD2691E),
                       onTap: () {
@@ -525,8 +543,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     
                     // إضافة أسير
                     _buildMenuItem(
-                      title: 'إضافة أسير',
-                      subtitle: 'إضافة وتوثيق بيانات أسير',
+                      title: _localization?.addPrisoner ?? 'إضافة أسير',
+                      subtitle: _localization?.settings ?? 'إضافة وتوثيق بيانات أسير',
                       icon: Icons.lock_person_outlined,
                       color: const Color(0xFF708090),
                       onTap: () {
@@ -574,8 +592,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     
                     // إدارة الشهداء
                     _buildMenuItem(
-                      title: 'إدارة الشهداء',
-                      subtitle: 'مراجعة وتوثيق بيانات الشهداء',
+                      title: _localization?.martyrs ?? 'إدارة الشهداء',
+                      subtitle: _localization?.dataManagement ?? 'مراجعة وتوثيق بيانات الشهداء',
                       icon: Icons.person_off_outlined,
                       color: const Color(0xFF8B0000), // Dark red like screenshot
                       onTap: () {
@@ -587,8 +605,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
                     // إدارة الجرحى
                     _buildMenuItem(
-                      title: 'إدارة الجرحى',
-                      subtitle: 'مراجعة وتوثيق بيانات الجرحى',
+                      title: _localization?.injured ?? 'إدارة الجرحى',
+                      subtitle: _localization?.dataManagement ?? 'مراجعة وتوثيق بيانات الجرحى',
                       icon: Icons.medical_services_outlined,
                       color: const Color(0xFFD2691E), // Brown-orange like screenshot
                       onTap: () {

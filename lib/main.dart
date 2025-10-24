@@ -7,6 +7,7 @@ import 'constants/app_colors.dart';
 import 'constants/app_constants.dart';
 import 'screens/splash_screen.dart';
 import 'services/theme_service.dart';
+import 'l10n/app_localizations.dart';
 
 void main() async {
   bool firebaseInitialized = false;
@@ -85,7 +86,7 @@ void main() async {
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: 'Error: $e\n\nStackTrace: $stackTrace'));
                   },
-                  child: const Text('نسخ معلومات الخطأ'),
+                  child: Text(localization?.copyErrorInfo ?? 'نسخ معلومات الخطأ'),
                 ),
               ],
             ),
@@ -115,10 +116,12 @@ class _PalestineMartyrAppState extends State<PalestineMartyrApp> {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context);
+    
     // عرض شاشة خطأ إذا فشل Firebase
     if (!widget.firebaseInitialized && widget.initError != null) {
       return MaterialApp(
-        title: 'Firebase Error',
+        title: localization?.error ?? 'Error',
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           backgroundColor: AppColors.error,
@@ -135,9 +138,9 @@ class _PalestineMartyrAppState extends State<PalestineMartyrApp> {
                       color: Colors.white,
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'خطأ في تهيئة Firebase',
-                      style: TextStyle(
+                    Text(
+                      localization?.criticalError ?? 'خطأ حرج في التطبيق',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -165,7 +168,7 @@ class _PalestineMartyrAppState extends State<PalestineMartyrApp> {
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: widget.initError!));
                       },
-                      child: const Text('نسخ رسالة الخطأ'),
+                      child: Text(localization?.copyErrorInfo ?? 'نسخ معلومات الخطأ'),
                     ),
                   ],
                 ),
@@ -184,7 +187,7 @@ class _PalestineMartyrAppState extends State<PalestineMartyrApp> {
           valueListenable: _themeService.localeNotifier,
           builder: (context, locale, child) {
             return MaterialApp(
-              title: AppConstants.appName,
+              title: localization?.appName ?? AppConstants.appName,
               debugShowCheckedModeBanner: false,
               
               // دعم المظهر الديناميكي
@@ -218,14 +221,12 @@ class _PalestineMartyrAppState extends State<PalestineMartyrApp> {
               // دعم اللغة الديناميكي
               locale: locale,
               localizationsDelegates: const [
+                AppLocalizations.delegate,
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
-              supportedLocales: const [
-                Locale('ar', 'SA'),
-                Locale('en', 'US'),
-              ],
+              supportedLocales: AppLocalizations.supportedLocales,
               home: const SplashScreen(),
             );
           },
