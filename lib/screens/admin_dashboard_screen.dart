@@ -622,7 +622,42 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
           ),
           child: Row(
+            textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
             children: [
+              if (isRtl) ...[
+                Icon(
+                  Icons.arrow_back_ios,
+                  color: color,
+                  size: 16,
+                ),
+                const SizedBox(width: 12),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                      textAlign: isRtl ? TextAlign.right : TextAlign.left,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                      textAlign: isRtl ? TextAlign.right : TextAlign.left,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
               Container(
                 width: 50,
                 height: 50,
@@ -636,35 +671,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   color: AppColors.primaryWhite,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
+              if (!isRtl) ...[
+                const SizedBox(width: 12),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: color,
+                  size: 16,
                 ),
-              ),
-              Icon(
-                Icons.arrow_back_ios,
-                color: color,
-                size: 16,
-              ),
+              ],
             ],
           ),
         ),
@@ -768,7 +782,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
