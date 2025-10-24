@@ -137,7 +137,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         centerTitle: true,
         backgroundColor: AppColors.primaryGreen,
         elevation: 4,
-        leading: isRtl ? null : Builder(
+        leading: !isRtl ? Builder(
           builder: (context) => IconButton(
             onPressed: () => Scaffold.of(context).openDrawer(),
             icon: const Icon(
@@ -146,7 +146,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
             tooltip: 'القائمة الجانبية',
           ),
-        ),
+        ) : null,
         actions: [
           if (isRtl) Builder(
             builder: (context) => IconButton(
@@ -158,29 +158,31 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               tooltip: 'القائمة الجانبية',
             ),
           ),
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AdminSettingsScreen(),
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.settings,
-              color: AppColors.primaryWhite,
+          if (!isRtl) ...[
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AdminSettingsScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.settings,
+                color: AppColors.primaryWhite,
+              ),
+              tooltip: 'الإعدادات',
             ),
-            tooltip: 'الإعدادات',
-          ),
-          IconButton(
-            onPressed: _logout,
-            icon: const Icon(
-              Icons.logout,
-              color: AppColors.primaryWhite,
+            IconButton(
+              onPressed: _logout,
+              icon: const Icon(
+                Icons.logout,
+                color: AppColors.primaryWhite,
+              ),
+              tooltip: 'تسجيل الخروج',
             ),
-            tooltip: 'تسجيل الخروج',
-          ),
+          ],
         ],
       ),
       drawer: isRtl ? null : _buildDrawer(),
