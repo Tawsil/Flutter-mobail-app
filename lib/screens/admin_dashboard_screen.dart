@@ -456,69 +456,90 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       child: Drawer(
         width: 320,
         child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.primaryGreen.withOpacity(0.9),
-              AppColors.primaryWhite,
-            ],
+          decoration: const BoxDecoration(
+            color: AppColors.primaryWhite,
           ),
-        ),
-        child: Column(
-          children: [
-            // رأس القائمة
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
-              decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
+          child: Column(
+            children: [
+              // رأس القائمة - تصميم مطابق للصورة
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF2E7D32), // Dark green like in screenshot
+                ),
+                child: Column(
+                  children: [
+                    // سهم العودة في أعلى اليسار
+                    if (isRtl)
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back_ios,
+                            color: AppColors.primaryWhite,
+                            size: 24,
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                    
+                    // صورة المدير
+                    const CircleAvatar(
+                      radius: 35,
+                      backgroundColor: AppColors.primaryWhite,
+                      child: Stack(
+                        children: [
+                          Icon(
+                            Icons.security,
+                            size: 30,
+                            color: Color(0xFF2E7D32),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Icon(
+                              Icons.person,
+                              size: 18,
+                              color: Color(0xFF2E7D32),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    Text(
+                      _adminName ?? 'المسؤول',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryWhite,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Administrator',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.primaryWhite,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: Column(
-                children: [
-                  const CircleAvatar(
-                    radius: 40,
-                    backgroundColor: AppColors.primaryWhite,
-                    child: Icon(
-                      Icons.admin_panel_settings,
-                      size: 40,
-                      color: AppColors.primaryGreen,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    _adminName ?? 'المسؤول',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryWhite,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Administrator',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.primaryWhite,
-                    ),
-                  ),
-                ],
-              ),
-            ),
 
-            // قائمة الإدارة
+            // قائمة الإدارة - بطاقات مطابقة للصورة
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 children: [
-                  const SizedBox(height: 20),
-
                   _buildDrawerItem(
                     title: 'إدارة الشهداء',
                     subtitle: 'مراجعة وتوثيق بيانات الشهداء',
-                    icon: Icons.person_off_outlined,
-                    color: AppColors.primaryRed,
+                    icon: Icons.do_not_disturb_alt,
+                    cardColor: const Color(0xFFB71C1C), // Dark red
+                    iconColor: const Color(0xFFD32F2F), // Red
                     onTap: () {
                       Navigator.pop(context);
                       _navigateToManagement('الشهداء');
@@ -529,8 +550,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   _buildDrawerItem(
                     title: 'إدارة الجرحى',
                     subtitle: 'مراجعة وتوثيق بيانات الجرحى',
-                    icon: Icons.healing_outlined,
-                    color: AppColors.warning,
+                    icon: Icons.medical_services_outlined,
+                    cardColor: const Color(0xFFE65100), // Dark orange
+                    iconColor: const Color(0xFFF57C00), // Orange
                     onTap: () {
                       Navigator.pop(context);
                       _navigateToManagement('الجرحى');
@@ -542,7 +564,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     title: 'إدارة الأسرى',
                     subtitle: 'مراجعة وتوثيق بيانات الأسرى',
                     icon: Icons.lock_person_outlined,
-                    color: AppColors.earthBrown,
+                    cardColor: const Color(0xFF263238), // Dark gray-blue
+                    iconColor: const Color(0xFF455A64), // Gray-blue
                     onTap: () {
                       Navigator.pop(context);
                       _navigateToManagement('الأسرى');
@@ -553,8 +576,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   _buildDrawerItem(
                     title: 'إدارة المستخدمين',
                     subtitle: 'إدارة حسابات المستخدمين',
-                    icon: Icons.people_outlined,
-                    color: AppColors.primaryGreen,
+                    icon: Icons.group_outlined,
+                    cardColor: const Color(0xFF1B5E20), // Dark green
+                    iconColor: const Color(0xFF388E3C), // Green
                     onTap: () {
                       Navigator.pop(context);
                       _navigateToManagement('المستخدمين');
@@ -566,7 +590,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     title: 'الإعدادات',
                     subtitle: 'إعدادات التطبيق والحساب',
                     icon: Icons.settings,
-                    color: AppColors.info,
+                    cardColor: const Color(0xFF0D47A1), // Dark blue
+                    iconColor: const Color(0xFF1976D2), // Blue
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -581,7 +606,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
             ),
 
-            // زر تسجيل الخروج
+            // زر تسجيل الخروج - تصميم مطابق للصورة
             Container(
               margin: const EdgeInsets.all(16),
               child: ElevatedButton(
@@ -590,25 +615,28 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   _logout();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.error,
+                  backgroundColor: const Color(0xFFE53935), // Bright red like screenshot
                   foregroundColor: AppColors.primaryWhite,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  elevation: 2,
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
                   children: [
-                    Icon(Icons.logout),
-                    SizedBox(width: 8),
+                    // النص أولاً، ثم الأيقونة للـ RTL
                     Text(
                       'تسجيل الخروج',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.logout),
                   ],
                 ),
               ),
@@ -624,13 +652,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     required String title,
     required String subtitle,
     required IconData icon,
-    required Color color,
+    required Color cardColor,
+    required Color iconColor,
     required VoidCallback onTap,
   }) {
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
     
     return Card(
-      elevation: 4,
+      elevation: 6,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -645,22 +674,25 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                color.withOpacity(0.1),
-                color.withOpacity(0.05),
+                cardColor,
+                cardColor.withOpacity(0.9),
               ],
             ),
           ),
           child: Row(
             textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
             children: [
+              // سهم على اليسار للعربية
               if (isRtl) ...[
                 Icon(
-                  Icons.arrow_back_ios,
-                  color: color,
-                  size: 16,
+                  Icons.chevron_left,
+                  color: AppColors.primaryWhite,
+                  size: 18,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
               ],
+              
+              // النص في الوسط (لليمين للعربية)
               Expanded(
                 child: Column(
                   crossAxisAlignment: isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -670,7 +702,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: color,
+                        color: AppColors.primaryWhite,
                       ),
                       textAlign: isRtl ? TextAlign.right : TextAlign.left,
                     ),
@@ -679,20 +711,30 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       subtitle,
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: AppColors.primaryWhite.withOpacity(0.8),
                       ),
                       textAlign: isRtl ? TextAlign.right : TextAlign.left,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
+              
+              const SizedBox(width: 16),
+              
+              // أيقونة في دائرة ملونة على اليمين للعربية
               Container(
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: color,
+                  color: iconColor,
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: iconColor.withOpacity(0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Icon(
                   icon,
@@ -700,12 +742,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   color: AppColors.primaryWhite,
                 ),
               ),
+              
+              // سهم على اليمين للإنجليزية
               if (!isRtl) ...[
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Icon(
-                  Icons.arrow_forward_ios,
-                  color: color,
-                  size: 16,
+                  Icons.chevron_right,
+                  color: AppColors.primaryWhite,
+                  size: 18,
                 ),
               ],
             ],
