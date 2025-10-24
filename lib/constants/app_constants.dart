@@ -83,8 +83,7 @@ class AppConstants {
   static const String confirmBackupData = 'هل تريد إنشاء نسخة احتياطية من جميع البيانات؟';
   static const String confirmRestoreData = 'هل تريد استعادة البيانات من النسخة الاحتياطية؟';
   static const String confirmClearSearchHistory = 'هل تريد مسح تاريخ البحث؟';
-  static const String confirmEnableLocation = 'هل تريد تفعيل خدمة الموقع للخرائط؟';;
-}
+  static const String confirmEnableLocation = 'هل تريد تفعيل خدمة الموقع للخرائط؟';
   
   // معايير البحث المتقدم
   static const Map<String, String> searchCriteria = {
