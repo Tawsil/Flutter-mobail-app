@@ -147,8 +147,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             tooltip: 'القائمة الجانبية',
           ),
         ),
-        actions: isRtl ? [
-          Builder(
+        actions: [
+          if (isRtl) Builder(
             builder: (context) => IconButton(
               onPressed: () => Scaffold.of(context).openEndDrawer(),
               icon: const Icon(
@@ -158,8 +158,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               tooltip: 'القائمة الجانبية',
             ),
           ),
-        ] : null,
-        actions: [
           IconButton(
             onPressed: () {
               Navigator.push(
