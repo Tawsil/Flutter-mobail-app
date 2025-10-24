@@ -146,7 +146,36 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
             tooltip: 'القائمة الجانبية',
           ),
-        ) : null,
+        ) : Builder(
+          builder: (context) => Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AdminSettingsScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(
+                  Icons.settings,
+                  color: AppColors.primaryWhite,
+                ),
+                tooltip: 'الإعدادات',
+              ),
+              IconButton(
+                onPressed: _logout,
+                icon: const Icon(
+                  Icons.logout,
+                  color: AppColors.primaryWhite,
+                ),
+                tooltip: 'تسجيل الخروج',
+              ),
+            ],
+          ),
+        ),
         actions: [
           if (isRtl) Builder(
             builder: (context) => IconButton(
