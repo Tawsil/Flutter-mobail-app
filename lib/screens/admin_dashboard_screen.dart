@@ -742,6 +742,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+    
     return Card(
       elevation: 6,
       shadowColor: color.withOpacity(0.3),
@@ -765,7 +767,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
           ),
           child: Row(
+            textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
             children: [
+              if (isRtl) ...[
+                Icon(
+                  Icons.arrow_back_ios,
+                  color: color,
+                  size: 16,
+                ),
+                const SizedBox(width: 12),
+              ],
               Container(
                 width: 60,
                 height: 60,
@@ -791,6 +802,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         fontWeight: FontWeight.bold,
                         color: color,
                       ),
+                      textAlign: isRtl ? TextAlign.right : TextAlign.left,
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -799,15 +811,33 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         fontSize: 14,
                         color: AppColors.textSecondary,
                       ),
+                      textAlign: isRtl ? TextAlign.right : TextAlign.left,
                     ),
                   ],
                 ),
               ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: color,
-                size: 20,
+              const SizedBox(width: 12),
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: 30,
+                  color: AppColors.primaryWhite,
+                ),
               ),
+              if (!isRtl) ...[
+                const SizedBox(width: 12),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: color,
+                  size: 16,
+                ),
+              ],
             ],
           ),
         ),
