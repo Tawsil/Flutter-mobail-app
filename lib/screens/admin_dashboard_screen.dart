@@ -122,10 +122,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl, // ضمان اتجاه RTL للعربية
-      child: Scaffold(
-        appBar: AppBar(
+    // تحديد اتجاه النص حسب اللغة الحالية
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+    
+    return Scaffold(
+      appBar: AppBar(
         title: const Text(
           'لوحة التحكم الإدارية',
           style: TextStyle(
@@ -136,9 +137,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         centerTitle: true,
         backgroundColor: AppColors.primaryGreen,
         elevation: 4,
-        leading: Builder(
+        leading: isRtl ? null : Builder(
           builder: (context) => IconButton(
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
+            onPressed: () => Scaffold.of(context).openDrawer(),
             icon: const Icon(
               Icons.menu,
               color: AppColors.primaryWhite,
@@ -146,6 +147,18 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             tooltip: 'القائمة الجانبية',
           ),
         ),
+        actions: isRtl ? [
+          Builder(
+            builder: (context) => IconButton(
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              icon: const Icon(
+                Icons.menu,
+                color: AppColors.primaryWhite,
+              ),
+              tooltip: 'القائمة الجانبية',
+            ),
+          ),
+        ] : null,
         actions: [
           IconButton(
             onPressed: () {
@@ -172,7 +185,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
         ],
       ),
-      endDrawer: _buildDrawer(),
+      drawer: isRtl ? null : _buildDrawer(),
+      endDrawer: isRtl ? _buildDrawer() : null,
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(
@@ -334,7 +348,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             const SizedBox(height: 16),
                             ElevatedButton(
                               onPressed: () {
-                                Scaffold.of(context).openEndDrawer();
+                                if (isRtl) {
+                                  Scaffold.of(context).openEndDrawer();
+                                } else {
+                                  Scaffold.of(context).openDrawer();
+                                }
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primaryWhite,
@@ -398,7 +416,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
             ),
             ),
-      ),
     );
   }
 
