@@ -1,18 +1,7 @@
-import '../l10n/app_localizations.dart';
-import 'package:flutter/material.dart';
-
 class AppConstants {
   // معلومات التطبيق
-  static String getAppName(BuildContext context) {
-    return AppLocalizations.of(context)?.appName ?? 'توثيق الشهداء والجرحى والأسرى';
-  }
-  
-  static String getAppVersion(BuildContext context) {
-    final localization = AppLocalizations.of(context);
-    return localization?.appVersion('1.0.0') ?? 'الإصدار 1.0.0';
-  }
-  
-  static const String appVersionNumber = '1.0.0';
+  static const String appName = 'توثيق الشهداء والجرحى والأسرى';
+  static const String appVersion = '1.0.0';
   
   // مفاتيح التخزين المحلي
   static const String keyUserId = 'user_id';
@@ -31,30 +20,12 @@ class AppConstants {
   static const String tablePrisoners = 'prisoners';
   
   // حالات السجلات
-  static String getStatusPending(BuildContext context) {
-    return AppLocalizations.of(context)?.pending ?? 'قيد المراجعة';
-  }
-  
-  static String getStatusApproved(BuildContext context) {
-    return AppLocalizations.of(context)?.approved ?? 'تم التوثيق';
-  }
-  
-  static String getStatusRejected(BuildContext context) {
-    return AppLocalizations.of(context)?.rejected ?? 'مرفوض';
-  }
+  static const String statusPending = 'قيد المراجعة';
+  static const String statusApproved = 'تم التوثيق';
+  static const String statusRejected = 'مرفوض';
   
   // درجات الإصابة
-  static List<String> getInjuryDegrees(BuildContext context) {
-    final localization = AppLocalizations.of(context);
-    return [
-      localization?.mild ?? 'خفيفة',
-      localization?.moderate ?? 'متوسطة',
-      localization?.severe ?? 'خطيرة',
-      localization?.critical ?? 'حرجة',
-    ];
-  }
-  
-  static const List<String> defaultInjuryDegrees = [
+  static const List<String> injuryDegrees = [
     'خفيفة',
     'متوسطة',
     'خطيرة',
@@ -70,27 +41,12 @@ class AppConstants {
   static const int maxDocumentSizeMB = 10;
   
   // أقسام التطبيق
-  static String getSectionMartyrs(BuildContext context) {
-    return AppLocalizations.of(context)?.martyrs ?? 'الشهداء';
-  }
-  
-  static String getSectionInjured(BuildContext context) {
-    return AppLocalizations.of(context)?.injured ?? 'الجرحى';
-  }
-  
-  static String getSectionPrisoners(BuildContext context) {
-    return AppLocalizations.of(context)?.prisoners ?? 'الأسرى';
-  }
+  static const String sectionMartyrs = 'الشهداء';
+  static const String sectionInjured = 'الجرحى';
+  static const String sectionPrisoners = 'الأسرى';
   
   // رسائل التأكيد
-  static String getConfirmLogout(BuildContext context) {
-    return AppLocalizations.of(context)?.confirmLogout ?? 'هل أنت متأكد من تسجيل الخروج؟';
-  }
-  
-  static String getConfirmDelete(BuildContext context) {
-    return AppLocalizations.of(context)?.confirmDelete ?? 'هل أنت متأكد من حذف هذا السجل؟';
-  }
-  
-  static String getConfirmSubmit(BuildContext context) {
-    return AppLocalizations.of(context)?.confirmSubmit ?? 'هل أنت متأكد من إرسال هذا النموذج؟';
-  }
+  static const String confirmLogout = 'هل أنت متأكد من تسجيل الخروج؟';
+  static const String confirmDelete = 'هل أنت متأكد من حذف هذا السجل؟';
+  static const String confirmSubmit = 'هل أنت متأكد من إرسال هذا النموذج؟';
+}
