@@ -139,4 +139,37 @@ class BackupService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('auto_backup') ?? false;
   }
+
+  /// تهيئة الخدمة
+  Future<void> initialize() async {
+    await SharedPreferences.getInstance();
+  }
+
+  /// الحصول على قائمة النسخ الاحتياطية
+  Future<List<Map<String, dynamic>>> getBackupList() async {
+    final user = await _authService.getCurrentUser();
+    if (user == null) return [];
+
+    final snapshot = await _firestore
+        .collection('backups')
+        .where('user_id', isEqualTo: user.uid)
+        .orderBy('created_at', descending: true)
+        .get();
+
+    return snapshot.docs.map((doc) => {
+      'id': doc.id,
+      ...doc.data() as Map<String, dynamic>
+    }).toList();
+  }
+
+  /// الحصول على إعدادات النسخ الاحتياطي
+  Map<String, dynamic> getBackupSettings() {
+    return {
+      'auto_backup': false,
+      'backup_frequency': 'weekly',
+      'backup_time': '02:00',
+      'backup_location': 'cloud',
+      'max_backups': 10,
+    };
+  }
 }

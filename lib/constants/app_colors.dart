@@ -30,6 +30,12 @@ class AppColors {
   static const Color error = Color(0xFFF44336);
   static const Color info = Color(0xFF2196F3);
   
+  // إضافات للشاشات الجديدة
+  static const Color primaryColor = primaryGreen; // Alias for primaryGreen
+  static const Color backgroundColor = Color(0xFFF8F9FA); // خلفية فاتحة
+  static const Color accentColor = Color(0xFF2196F3); // لون إضافي
+  static const Color borderColor = Color(0xFFE0E0E0); // لون الحدود
+  
   // تدرجات لونية
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
