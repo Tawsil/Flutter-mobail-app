@@ -454,55 +454,461 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget _buildDrawer() {
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
     final ThemeData theme = Theme.of(context);
+    final bool isDark = theme.brightness == Brightness.dark;
     
     return Directionality(
       textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
       child: Drawer(
-        width: 320,
+        width: 300,
         child: Container(
-          decoration: const BoxDecoration(
-            color: AppColors.primaryWhite,
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A1A1A) : AppColors.primaryWhite,
           ),
           child: Column(
             children: [
-              // رأس القائمة - تصميم مطابق للصورة
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF2E7D32), // Dark green like in screenshot
-                ),
-                child: Column(
+              // رأس القائمة - تصميم مطابق للصورة تماماً
+              _buildDrawerHeader(isDark),
+              
+              // العناصر الرئيسية للقائمة
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   children: [
-                    // سهم العودة في أعلى اليسار
-                    if (isRtl)
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back_ios,
-                            color: AppColors.primaryWhite,
-                            size: 24,
+                    // قسم عنوان الإضافة السريعة
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.add_circle_outline,
+                            color: Color(0xFF2E7D32),
+                            size: 20,
                           ),
-                          onPressed: () => Navigator.pop(context),
+                          const SizedBox(width: 8),
+                          Text(
+                            'إضافة جديدة',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF2E7D32),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // إضافة شهيد
+                    _buildMenuItem(
+                      title: 'إضافة شهيد',
+                      subtitle: 'إضافة وتوثيق بيانات شهيد',
+                      icon: Icons.person_off_outlined,
+                      color: const Color(0xFF8B0000),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _navigateToAddForm(AppConstants.sectionMartyrs);
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // إضافة جريح
+                    _buildMenuItem(
+                      title: 'إضافة جريح',
+                      subtitle: 'إضافة وتوثيق بيانات جريح',
+                      icon: Icons.medical_services_outlined,
+                      color: const Color(0xFFD2691E),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _navigateToAddForm(AppConstants.sectionInjured);
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // إضافة أسير
+                    _buildMenuItem(
+                      title: 'إضافة أسير',
+                      subtitle: 'إضافة وتوثيق بيانات أسير',
+                      icon: Icons.lock_person_outlined,
+                      color: const Color(0xFF708090),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _navigateToAddForm(AppConstants.sectionPrisoners);
+                      },
+                    ),
+                    
+                    // فاصل
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 20),
+                      height: 1,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFF2E7D32),
+                            Color(0xFF2E7D32),
+                          ],
                         ),
                       ),
+                    ),
                     
-                    // صورة المدير
-                    const CircleAvatar(
-                      radius: 35,
-                      backgroundColor: AppColors.primaryWhite,
-                      child: Stack(
+                    // قسم عنوان الإدارة
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: Row(
                         children: [
-                          Icon(
-                            Icons.security,
-                            size: 30,
+                          const Icon(
+                            Icons.admin_panel_settings,
                             color: Color(0xFF2E7D32),
+                            size: 20,
                           ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Icon(
+                          const SizedBox(width: 8),
+                          Text(
+                            'إدارة البيانات',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF2E7D32),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // إدارة الشهداء
+                    _buildMenuItem(
+                      title: 'إدارة الشهداء',
+                      subtitle: 'مراجعة وتوثيق بيانات الشهداء',
+                      icon: Icons.person_off_outlined,
+                      color: const Color(0xFF8B0000), // Dark red like screenshot
+                      onTap: () {
+                        Navigator.pop(context);
+                        _navigateToManagement('الشهداء');
+                      },
+                    ),
+                    const SizedBox(height: 12),
+
+                    // إدارة الجرحى
+                    _buildMenuItem(
+                      title: 'إدارة الجرحى',
+                      subtitle: 'مراجعة وتوثيق بيانات الجرحى',
+                      icon: Icons.medical_services_outlined,
+                      color: const Color(0xFFD2691E), // Brown-orange like screenshot
+                      onTap: () {
+                        Navigator.pop(context);
+                        _navigateToManagement('الجرحى');
+                      },
+                    ),
+                    const SizedBox(height: 12),
+
+                    // إدارة الأسرى
+                    _buildMenuItem(
+                      title: 'إدارة الأسرى',
+                      subtitle: 'مراجعة وتوثيق بيانات الأسرى',
+                      icon: Icons.lock_person_outlined,
+                      color: const Color(0xFF708090), // Slate gray like screenshot
+                      onTap: () {
+                        Navigator.pop(context);
+                        _navigateToManagement('الأسرى');
+                      },
+                    ),
+                    const SizedBox(height: 12),
+
+                    // إدارة المستخدمين
+                    _buildMenuItem(
+                      title: 'إدارة المستخدمين',
+                      subtitle: 'إدارة حسابات المستخدمين',
+                      icon: Icons.group_outlined,
+                      color: const Color(0xFF2E7D32), // Dark green like screenshot
+                      onTap: () {
+                        Navigator.pop(context);
+                        _navigateToManagement('المستخدمين');
+                      },
+                    ),
+                    const SizedBox(height: 12),
+
+                    // الإعدادات
+                    _buildMenuItem(
+                      title: 'الإعدادات',
+                      subtitle: 'إعدادات التطبيق والحساب',
+                      icon: Icons.settings,
+                      color: const Color(0xFF4682B4), // Steel blue like screenshot
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AdminSettingsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // زر تسجيل الخروج
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: _buildLogoutButton(isDark),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // رأس القائمة مع الترس وزر الخروج
+  Widget _buildDrawerHeader(bool isDark) {
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+    
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(
+        20, 
+        40 + MediaQuery.of(context).padding.top, 
+        20, 
+        30
+      ),
+      decoration: const BoxDecoration(
+        color: Color(0xFF2E7D32), // Dark green exactly like screenshot
+      ),
+      child: Column(
+        children: [
+          // الصف الأول: سهم العودة + ترس الإعدادات
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // سهم العودة
+              IconButton(
+                icon: Icon(
+                  isRtl ? Icons.arrow_forward : Icons.arrow_back,
+                  color: AppColors.primaryWhite,
+                  size: 24,
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
+              
+              // ترس الإعدادات
+              IconButton(
+                icon: const Icon(
+                  Icons.settings,
+                  color: AppColors.primaryWhite,
+                  size: 24,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AdminSettingsScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // أيقونة المدير
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: AppColors.primaryWhite,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Stack(
+              children: [
+                Center(
+                  child: Icon(
+                    Icons.security,
+                    size: 40,
+                    color: Color(0xFF2E7D32),
+                  ),
+                ),
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: Icon(
+                    Icons.person_outline,
+                    size: 20,
+                    color: Color(0xFF2E7D32),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // اسم المدير
+          const Text(
+            'Administrator',
+            style: TextStyle(
+              color: AppColors.primaryWhite,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          
+          const SizedBox(height: 4),
+          
+          const Text(
+            'Administrator',
+            style: TextStyle(
+              color: AppColors.primaryWhite,
+              fontSize: 16,
+              fontWeight: FontWeight.normal,
+              height: 1.2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // بناء عنصر القائمة
+  Widget _buildMenuItem({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+    final ThemeData theme = Theme.of(context);
+    final bool isDark = theme.brightness == Brightness.dark;
+    
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? color : color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: isDark ? [
+            BoxShadow(
+              color: color.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ] : null,
+        ),
+        child: Row(
+          textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+          children: [
+            // النص الرئيسي
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: isDark ? AppColors.primaryWhite : color,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: isDark ? AppColors.primaryWhite.withOpacity(0.8) : color.withOpacity(0.8),
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(width: 12),
+            
+            // الأيقونة
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.primaryWhite : color,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: isDark ? color : AppColors.primaryWhite,
+                size: 20,
+              ),
+            ),
+            
+            // سهم التنقل
+            Icon(
+              isRtl ? Icons.chevron_left : Icons.chevron_right,
+              color: isDark ? AppColors.primaryWhite : color,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // زر تسجيل الخروج
+  Widget _buildLogoutButton(bool isDark) {
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+    
+    return InkWell(
+      onTap: () {
+        Navigator.pop(context);
+        _logout();
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          color: AppColors.error,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.error.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+          children: [
+            Text(
+              'تسجيل الخروج',
+              style: const TextStyle(
+                color: AppColors.primaryWhite,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(
+              Icons.logout,
+              color: AppColors.primaryWhite,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerOld() { // نسخة قديمة للنتيجة                            child: Icon(
                               Icons.person,
                               size: 18,
                               color: Color(0xFF2E7D32),
