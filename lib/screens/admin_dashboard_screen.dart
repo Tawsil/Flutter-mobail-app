@@ -529,7 +529,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ),
               ),
 
-            // قائمة الإدارة - بطاقات مطابقة للصورة
+            // قائمة الإدارة - الألوان الأصلية
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -538,8 +538,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     title: 'إدارة الشهداء',
                     subtitle: 'مراجعة وتوثيق بيانات الشهداء',
                     icon: Icons.do_not_disturb_alt,
-                    cardColor: const Color(0xFFB71C1C), // Dark red
-                    iconColor: const Color(0xFFD32F2F), // Red
+                    cardColor: AppColors.primaryRed.withOpacity(0.1),
+                    iconColor: AppColors.primaryRed,
                     onTap: () {
                       Navigator.pop(context);
                       _navigateToManagement('الشهداء');
@@ -551,8 +551,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     title: 'إدارة الجرحى',
                     subtitle: 'مراجعة وتوثيق بيانات الجرحى',
                     icon: Icons.medical_services_outlined,
-                    cardColor: const Color(0xFFE65100), // Dark orange
-                    iconColor: const Color(0xFFF57C00), // Orange
+                    cardColor: AppColors.warning.withOpacity(0.1),
+                    iconColor: AppColors.warning,
                     onTap: () {
                       Navigator.pop(context);
                       _navigateToManagement('الجرحى');
@@ -564,8 +564,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     title: 'إدارة الأسرى',
                     subtitle: 'مراجعة وتوثيق بيانات الأسرى',
                     icon: Icons.lock_person_outlined,
-                    cardColor: const Color(0xFF263238), // Dark gray-blue
-                    iconColor: const Color(0xFF455A64), // Gray-blue
+                    cardColor: AppColors.earthBrown.withOpacity(0.1),
+                    iconColor: AppColors.earthBrown,
                     onTap: () {
                       Navigator.pop(context);
                       _navigateToManagement('الأسرى');
@@ -577,8 +577,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     title: 'إدارة المستخدمين',
                     subtitle: 'إدارة حسابات المستخدمين',
                     icon: Icons.group_outlined,
-                    cardColor: const Color(0xFF1B5E20), // Dark green
-                    iconColor: const Color(0xFF388E3C), // Green
+                    cardColor: AppColors.primaryGreen.withOpacity(0.1),
+                    iconColor: AppColors.primaryGreen,
                     onTap: () {
                       Navigator.pop(context);
                       _navigateToManagement('المستخدمين');
@@ -590,8 +590,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     title: 'الإعدادات',
                     subtitle: 'إعدادات التطبيق والحساب',
                     icon: Icons.settings,
-                    cardColor: const Color(0xFF0D47A1), // Dark blue
-                    iconColor: const Color(0xFF1976D2), // Blue
+                    cardColor: AppColors.info.withOpacity(0.1),
+                    iconColor: AppColors.info,
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -606,7 +606,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
             ),
 
-            // زر تسجيل الخروج - تصميم مطابق للصورة
+            // زر تسجيل الخروج - لون أحمر أصلي
             Container(
               margin: const EdgeInsets.all(16),
               child: ElevatedButton(
@@ -615,13 +615,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   _logout();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFE53935), // Bright red like screenshot
+                  backgroundColor: AppColors.error,
                   foregroundColor: AppColors.primaryWhite,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  elevation: 2,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -686,7 +685,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               if (isRtl) ...[
                 Icon(
                   Icons.chevron_left,
-                  color: AppColors.primaryWhite,
+                  color: iconColor,
                   size: 18,
                 ),
                 const SizedBox(width: 16),
@@ -702,7 +701,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primaryWhite,
+                        color: iconColor,
                       ),
                       textAlign: isRtl ? TextAlign.right : TextAlign.left,
                     ),
@@ -711,7 +710,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       subtitle,
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.primaryWhite.withOpacity(0.8),
+                        color: AppColors.textSecondary,
                       ),
                       textAlign: isRtl ? TextAlign.right : TextAlign.left,
                     ),
@@ -728,13 +727,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 decoration: BoxDecoration(
                   color: iconColor,
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: iconColor.withOpacity(0.3),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
                 ),
                 child: Icon(
                   icon,
@@ -748,7 +740,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 const SizedBox(width: 16),
                 Icon(
                   Icons.chevron_right,
-                  color: AppColors.primaryWhite,
+                  color: iconColor,
                   size: 18,
                 ),
               ],
