@@ -354,7 +354,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const FavoritesScreen(key: key),
+                                    builder: (context) => const FavoritesScreen(),
                                   ),
                                 );
                               },
@@ -372,7 +372,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const AdvancedSearchScreen(key: key),
+                                    builder: (context) => const AdvancedSearchScreen(),
                                   ),
                                 );
                               },
@@ -395,7 +395,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const StatisticsScreen(key: key),
+                                    builder: (context) => const StatisticsScreen(),
                                   ),
                                 );
                               },
@@ -413,7 +413,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const BackupScreen(key: key),
+                                    builder: (context) => const BackupScreen(),
                                   ),
                                 );
                               },
@@ -670,7 +670,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const AdvancedSearchScreen(key: key),
+                            builder: (context) => const AdvancedSearchScreen(),
                           ),
                         );
                       },
@@ -688,7 +688,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const FavoritesScreen(key: key),
+                            builder: (context) => const FavoritesScreen(),
                           ),
                         );
                       },
@@ -706,7 +706,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const StatisticsScreen(key: key),
+                            builder: (context) => const StatisticsScreen(),
                           ),
                         );
                       },
@@ -724,7 +724,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const BackupScreen(key: key),
+                            builder: (context) => const BackupScreen(),
                           ),
                         );
                       },
