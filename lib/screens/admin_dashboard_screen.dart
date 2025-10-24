@@ -185,7 +185,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ],
         ],
       ),
-      drawer: isRtl ? null : _buildDrawer(),
+      drawer: !isRtl ? _buildDrawer() : null,
       endDrawer: isRtl ? _buildDrawer() : null,
       body: _isLoading
           ? const Center(
@@ -420,9 +420,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   Widget _buildDrawer() {
-    return Drawer(
-      width: 320,
-      child: Container(
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+    
+    return Directionality(
+      textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+      child: Drawer(
+        width: 320,
+        child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -583,6 +587,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ],
         ),
       ),
+      ),
     );
   }
 
@@ -593,6 +598,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+    
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
